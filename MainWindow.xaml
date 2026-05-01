@@ -73,12 +73,12 @@
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
                                             <StackPanel>
-                                                <TextBlock Text="{Binding DisplayTitle}" TextWrapping="Wrap" FontWeight="SemiBold" MaxHeight="44"/>
-                                                <TextBlock Text="{Binding Preview}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" MaxHeight="54"/>
+                                                <TextBlock Text="{Binding DisplayTitle, Mode=OneWay}" TextWrapping="Wrap" FontWeight="SemiBold" MaxHeight="44"/>
+                                                <TextBlock Text="{Binding Preview, Mode=OneWay}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" MaxHeight="54"/>
                                                 <TextBlock Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,0" FontSize="12">
-                                                    <Run Text="{Binding FavoriteMeta}"/>
+                                                    <Run Text="{Binding FavoriteMeta, Mode=OneWay}"/>
                                                     <Run Text=" · "/>
-                                                    <Run Text="{Binding UpdatedAt, StringFormat={}{0:g}}"/>
+                                                    <Run Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:g}}"/>
                                                 </TextBlock>
                                             </StackPanel>
                                             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">

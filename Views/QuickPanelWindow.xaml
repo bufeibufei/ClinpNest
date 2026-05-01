@@ -41,12 +41,12 @@
                         <Border Padding="12" Margin="0,0,0,8" Background="#FFFFFF"
                                 BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8">
                             <StackPanel>
-                                <TextBlock Text="{Binding DisplayTitle}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="42"/>
-                                <TextBlock Text="{Binding Preview}" TextWrapping="Wrap" Foreground="#696B72" MaxHeight="40" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding DisplayTitle, Mode=OneWay}" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="42"/>
+                                <TextBlock Text="{Binding Preview, Mode=OneWay}" TextWrapping="Wrap" Foreground="#696B72" MaxHeight="40" Margin="0,5,0,0"/>
                                 <TextBlock Foreground="#696B72" Margin="0,8,0,0" FontSize="12">
-                                    <Run Text="{Binding FavoriteMeta}"/>
+                                    <Run Text="{Binding FavoriteMeta, Mode=OneWay}"/>
                                     <Run Text=" · "/>
-                                    <Run Text="{Binding UpdatedAt, StringFormat={}{0:g}}"/>
+                                    <Run Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:g}}"/>
                                 </TextBlock>
                             </StackPanel>
                         </Border>
@@ -64,11 +64,11 @@
                         <Border Padding="12" Margin="0,0,0,8" Background="#FFFFFF"
                                 BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8">
                             <StackPanel>
-                                <TextBlock Text="{Binding Preview}" TextWrapping="Wrap" MaxHeight="56"/>
+                                <TextBlock Text="{Binding Preview, Mode=OneWay}" TextWrapping="Wrap" MaxHeight="56"/>
                                 <TextBlock Foreground="#696B72" Margin="0,8,0,0" FontSize="12">
-                                    <Run Text="{Binding SourceApp}"/>
+                                    <Run Text="{Binding SourceApp, Mode=OneWay}"/>
                                     <Run Text=" · "/>
-                                    <Run Text="{Binding UpdatedAt, StringFormat={}{0:g}}"/>
+                                    <Run Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:g}}"/>
                                 </TextBlock>
                             </StackPanel>
                         </Border>
