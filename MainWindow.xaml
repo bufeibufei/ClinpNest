@@ -33,30 +33,30 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <DockPanel Margin="0,0,0,18">
+            <DockPanel Margin="0,0,0,14">
                 <StackPanel DockPanel.Dock="Left">
                     <TextBlock x:Name="PageTitle" Text="历史" FontSize="26" FontWeight="SemiBold"/>
                     <TextBlock x:Name="PageSubtitle" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="清空" Margin="0,0,8,0" Click="ClearButton_Click"/>
-                    <Button Content="刷新" Click="RefreshButton_Click"/>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                    <Button Content="清空" MinHeight="28" Padding="12,3" Margin="0,0,8,0" Click="ClearButton_Click"/>
+                    <Button Content="刷新" MinHeight="28" Padding="12,3" Click="RefreshButton_Click"/>
                 </StackPanel>
             </DockPanel>
 
             <Border Grid.Row="1" Background="{StaticResource PanelBackgroundBrush}" CornerRadius="10"
-                    BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" Padding="16">
+                    BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" Padding="14">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBox x:Name="SearchBox" TextChanged="SearchBox_TextChanged" Margin="0,0,0,12"
+                    <TextBox x:Name="SearchBox" TextChanged="SearchBox_TextChanged" Margin="0,0,0,10"
                              ToolTip="搜索内容、来源应用、收藏别名或 tag"/>
 
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                        <ItemsControl x:Name="ItemsList">
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl x:Name="ItemsList" AllowDrop="True" Drop="ItemsList_Drop">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapPanel IsItemsHost="True"/>
@@ -64,27 +64,36 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Padding="12" Margin="0,0,12,12" Background="#FFFFFF"
+                                    <Border Tag="{Binding}" Padding="10" Margin="0,0,10,10" Background="#FFFFFF"
                                             BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="8"
-                                            Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource CardWidthConverter}}">
+                                            Width="230" Height="126"
+                                            ToolTip="{Binding ContentText, Mode=OneWay}"
+                                            PreviewMouseLeftButtonDown="ItemCard_PreviewMouseLeftButtonDown"
+                                            MouseMove="ItemCard_MouseMove"
+                                            DragOver="ItemCard_DragOver"
+                                            Drop="ItemCard_Drop">
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="*"/>
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
                                             <StackPanel>
-                                                <TextBlock Text="{Binding DisplayTitle, Mode=OneWay}" TextWrapping="Wrap" FontWeight="SemiBold" MaxHeight="44"/>
-                                                <TextBlock Text="{Binding Preview, Mode=OneWay}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" MaxHeight="54"/>
-                                                <TextBlock Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,0" FontSize="12">
+                                                <TextBlock Text="{Binding ShortDisplayTitle, Mode=OneWay}" FontWeight="SemiBold"
+                                                           TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding ShortPreview, Mode=OneWay}" Foreground="{StaticResource TextSecondaryBrush}"
+                                                           Margin="0,5,0,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Foreground="{StaticResource TextSecondaryBrush}" Margin="0,7,0,0" FontSize="12"
+                                                           TextWrapping="NoWrap" TextTrimming="CharacterEllipsis">
                                                     <Run Text="{Binding FavoriteMeta, Mode=OneWay}"/>
                                                     <Run Text=" · "/>
                                                     <Run Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:g}}"/>
                                                 </TextBlock>
                                             </StackPanel>
-                                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
-                                                <Button Content="粘贴" Tag="{Binding}" Click="PasteItem_Click" Margin="0,0,8,0"/>
-                                                <Button Content="收藏" Tag="{Binding}" Click="FavoriteItem_Click" Margin="0,0,8,0"/>
-                                                <Button Content="删除" Tag="{Binding}" Click="DeleteItem_Click"/>
+                                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                                                <Button Content="粘贴" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="PasteItem_Click" Margin="0,0,6,0"/>
+                                                <Button Content="固定" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="PinItem_Click" Margin="0,0,6,0"/>
+                                                <Button Content="收藏" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="FavoriteItem_Click" Margin="0,0,6,0"/>
+                                                <Button Content="删除" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="DeleteItem_Click"/>
                                             </StackPanel>
                                         </Grid>
                                     </Border>

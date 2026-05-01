@@ -21,6 +21,8 @@ public partial class MainWindow
     private readonly ObservableCollection<ClipboardItem> _items = [];
     private HotkeySettings _hotkeySettings;
     private QuickPanelWindow? _quickPanel;
+    private ClipboardItem? _draggedItem;
+    private System.Windows.Point _dragStartPoint;
     private bool _favoritesOnly;
     private bool _isExiting;
 
@@ -83,9 +85,9 @@ public partial class MainWindow
 
     private async Task RefreshAsync()
     {
-        var results = await _clipboardRepository.SearchAsync(SearchBox.Text);
+        var results = await _clipboardRepository.SearchAsync(SearchBox.Text, favoritesOnly: _favoritesOnly);
         _items.Clear();
-        foreach (var item in _favoritesOnly ? results.Where(item => item.IsFavorite) : results)
+        foreach (var item in results)
         {
             _items.Add(item);
         }
@@ -217,7 +219,8 @@ public partial class MainWindow
             return;
         }
 
-        var dialog = new FavoriteDialog(item) { Owner = this };
+        var tags = await _clipboardRepository.GetFavoriteTagsAsync();
+        var dialog = new FavoriteDialog(item, tags) { Owner = this };
         if (dialog.ShowDialog() != true)
         {
             return;
@@ -235,6 +238,15 @@ public partial class MainWindow
         await RefreshAsync();
     }
 
+    private async void PinItem_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as System.Windows.Controls.Button)?.Tag is ClipboardItem item)
+        {
+            await _clipboardRepository.SetPinnedAsync(item.Id, !item.IsPinned);
+            await RefreshAsync();
+        }
+    }
+
     private async void DeleteItem_Click(object sender, RoutedEventArgs e)
     {
         if ((sender as System.Windows.Controls.Button)?.Tag is ClipboardItem item)
@@ -242,5 +254,62 @@ public partial class MainWindow
             await _clipboardRepository.SoftDeleteAsync(item.Id);
             await RefreshAsync();
         }
+    }
+
+    private void ItemCard_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        _dragStartPoint = e.GetPosition(null);
+        _draggedItem = (sender as FrameworkElement)?.Tag as ClipboardItem;
+    }
+
+    private void ItemCard_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        if (!_favoritesOnly || _draggedItem is null || e.LeftButton != MouseButtonState.Pressed)
+        {
+            return;
+        }
+
+        var current = e.GetPosition(null);
+        if (Math.Abs(current.X - _dragStartPoint.X) < SystemParameters.MinimumHorizontalDragDistance &&
+            Math.Abs(current.Y - _dragStartPoint.Y) < SystemParameters.MinimumVerticalDragDistance)
+        {
+            return;
+        }
+
+        System.Windows.DragDrop.DoDragDrop((DependencyObject)sender, _draggedItem, System.Windows.DragDropEffects.Move);
+    }
+
+    private void ItemCard_DragOver(object sender, System.Windows.DragEventArgs e)
+    {
+        e.Effects = _favoritesOnly && e.Data.GetDataPresent(typeof(ClipboardItem))
+            ? System.Windows.DragDropEffects.Move
+            : System.Windows.DragDropEffects.None;
+        e.Handled = true;
+    }
+
+    private async void ItemCard_Drop(object sender, System.Windows.DragEventArgs e)
+    {
+        if (!_favoritesOnly || e.Data.GetData(typeof(ClipboardItem)) is not ClipboardItem source ||
+            (sender as FrameworkElement)?.Tag is not ClipboardItem target ||
+            source.Id == target.Id)
+        {
+            return;
+        }
+
+        var sourceItem = _items.FirstOrDefault(item => item.Id == source.Id);
+        var targetItem = _items.FirstOrDefault(item => item.Id == target.Id);
+        if (sourceItem is null || targetItem is null)
+        {
+            return;
+        }
+
+        _items.Move(_items.IndexOf(sourceItem), _items.IndexOf(targetItem));
+        await _clipboardRepository.UpdateFavoriteOrderAsync(_items.ToList());
+        await RefreshAsync();
+    }
+
+    private void ItemsList_Drop(object sender, System.Windows.DragEventArgs e)
+    {
+        _draggedItem = null;
     }
 }

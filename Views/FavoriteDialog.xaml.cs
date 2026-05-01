@@ -5,12 +5,18 @@ namespace ClipNest.Views;
 
 public partial class FavoriteDialog
 {
-    public FavoriteDialog(ClipboardItem item)
+    public FavoriteDialog(ClipboardItem item, IEnumerable<string> tags)
     {
         InitializeComponent();
         AliasBox.Text = string.IsNullOrWhiteSpace(item.FavoriteAlias) ? SuggestedAlias(item.ContentText) : item.FavoriteAlias;
+        foreach (var tag in tags)
+        {
+            TagBox.Items.Add(tag);
+        }
+
         TagBox.Text = item.FavoriteTag;
         PreviewText.Text = item.Preview;
+        PreviewText.ToolTip = item.ContentText;
         RemoveButton.Visibility = item.IsFavorite ? Visibility.Visible : Visibility.Collapsed;
     }
 
@@ -27,6 +33,18 @@ public partial class FavoriteDialog
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         DialogResult = true;
+    }
+
+    private void AddTagButton_Click(object sender, RoutedEventArgs e)
+    {
+        var tag = TagBox.Text.Trim();
+        if (string.IsNullOrWhiteSpace(tag) || TagBox.Items.Contains(tag))
+        {
+            return;
+        }
+
+        TagBox.Items.Add(tag);
+        TagBox.SelectedItem = tag;
     }
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)

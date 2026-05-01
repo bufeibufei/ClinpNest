@@ -14,18 +14,22 @@
         </Grid.RowDefinitions>
 
         <TextBlock Text="收藏条目" FontSize="24" FontWeight="SemiBold"/>
-        <TextBlock Grid.Row="1" Text="为收藏内容设置一个容易搜索的别名和分类 tag。"
+        <TextBlock Grid.Row="1" Text="设置别名，并从下拉框选择或新增一个分类 tag。"
                    Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,20"/>
 
         <StackPanel Grid.Row="2">
             <TextBlock Text="别名" Margin="0,0,0,6"/>
             <TextBox x:Name="AliasBox"/>
             <TextBlock Text="分类 tag" Margin="0,16,0,6"/>
-            <TextBox x:Name="TagBox"/>
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="添加" Margin="8,0,0,0" Click="AddTagButton_Click"/>
+                <ComboBox x:Name="TagBox" IsEditable="True" MinHeight="34"/>
+            </DockPanel>
         </StackPanel>
 
         <Border Grid.Row="3" Background="#F7F7FA" CornerRadius="8" Padding="12" Margin="0,18,0,18">
-            <TextBlock x:Name="PreviewText" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" MaxHeight="70"/>
+            <TextBlock x:Name="PreviewText" Foreground="{StaticResource TextSecondaryBrush}"
+                       TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
         </Border>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">

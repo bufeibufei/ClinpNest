@@ -34,7 +34,9 @@ public sealed class AppDatabase
                 is_pinned INTEGER NOT NULL DEFAULT 0,
                 is_deleted INTEGER NOT NULL DEFAULT 0,
                 favorite_alias TEXT NOT NULL DEFAULT '',
-                favorite_tag TEXT NOT NULL DEFAULT ''
+                favorite_tag TEXT NOT NULL DEFAULT '',
+                favorited_at TEXT NULL,
+                favorite_order INTEGER NOT NULL DEFAULT 0
             );
 
             CREATE INDEX IF NOT EXISTS idx_clipboard_items_updated
@@ -44,23 +46,39 @@ public sealed class AppDatabase
                 key TEXT PRIMARY KEY,
                 value TEXT NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS favorite_tags (
+                name TEXT PRIMARY KEY,
+                created_at TEXT NOT NULL
+            );
             """;
         await command.ExecuteNonQueryAsync();
         await AddColumnIfMissingAsync(connection, "clipboard_items", "favorite_alias", "TEXT NOT NULL DEFAULT ''");
         await AddColumnIfMissingAsync(connection, "clipboard_items", "favorite_tag", "TEXT NOT NULL DEFAULT ''");
+        await AddColumnIfMissingAsync(connection, "clipboard_items", "favorited_at", "TEXT NULL");
+        await AddColumnIfMissingAsync(connection, "clipboard_items", "favorite_order", "INTEGER NOT NULL DEFAULT 0");
     }
 
     private static async Task AddColumnIfMissingAsync(SqliteConnection connection, string table, string column, string definition)
     {
+        var exists = false;
         var check = connection.CreateCommand();
         check.CommandText = $"PRAGMA table_info({table})";
-        await using var reader = await check.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
+        await using (var reader = await check.ExecuteReaderAsync())
         {
-            if (string.Equals(reader.GetString(1), column, StringComparison.OrdinalIgnoreCase))
+            while (await reader.ReadAsync())
             {
-                return;
+                if (string.Equals(reader.GetString(1), column, StringComparison.OrdinalIgnoreCase))
+                {
+                    exists = true;
+                    break;
+                }
             }
+        }
+
+        if (exists)
+        {
+            return;
         }
 
         var alter = connection.CreateCommand();
