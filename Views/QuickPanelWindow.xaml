@@ -1,0 +1,55 @@
+<Window x:Class="ClipNest.Views.QuickPanelWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ClipNest Quick Panel"
+        Width="620" Height="520"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="NoResize"
+        Topmost="True"
+        ShowInTaskbar="False"
+        Background="Transparent"
+        Deactivated="Window_Deactivated"
+        KeyDown="Window_KeyDown">
+    <Border Background="#FDFDFE" CornerRadius="12" Padding="14"
+            BorderBrush="#DADDE5" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" Opacity="0.18" BlurRadius="24" ShadowDepth="8"/>
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBox x:Name="SearchBox" FontSize="16" MinHeight="42"
+                     TextChanged="SearchBox_TextChanged"
+                     KeyDown="SearchBox_KeyDown"/>
+
+            <ListBox x:Name="ItemsList" Grid.Row="1" Margin="0,12,0,8"
+                     BorderThickness="0" Background="Transparent"
+                     MouseDoubleClick="ItemsList_MouseDoubleClick"
+                     KeyDown="ItemsList_KeyDown">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="12" Margin="0,0,0,8" Background="#FFFFFF"
+                                BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Preview}" TextWrapping="Wrap" MaxHeight="62"/>
+                                <TextBlock Foreground="#696B72" Margin="0,8,0,0" FontSize="12">
+                                    <Run Text="{Binding SourceApp}"/>
+                                    <Run Text=" · "/>
+                                    <Run Text="{Binding UpdatedAt, StringFormat={}{0:g}}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock Grid.Row="2" Text="Enter 粘贴 · Esc 关闭 · ↑↓ 选择"
+                       Foreground="#696B72" HorizontalAlignment="Right"/>
+        </Grid>
+    </Border>
+</Window>
