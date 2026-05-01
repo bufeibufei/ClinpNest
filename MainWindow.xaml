@@ -53,7 +53,7 @@
                     </Grid.RowDefinitions>
 
                     <TextBox x:Name="SearchBox" TextChanged="SearchBox_TextChanged" Margin="0,0,0,10"
-                             ToolTip="搜索内容、来源应用、收藏别名或 tag"/>
+                             ToolTip="搜索内容、来源应用、收藏别名或分类"/>
 
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                         <ItemsControl x:Name="ItemsList" AllowDrop="True" Drop="ItemsList_Drop">
@@ -66,7 +66,7 @@
                                 <DataTemplate>
                                     <Border x:Name="Card" Tag="{Binding}" Padding="10" Margin="0,0,10,10" Background="#FFFFFF"
                                             BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="8"
-                                            Width="230" Height="126"
+                                            Width="250" Height="134"
                                             ToolTip="{Binding ContentText, Mode=OneWay}"
                                             RenderTransformOrigin="0.5,0.5"
                                             PreviewMouseLeftButtonDown="ItemCard_PreviewMouseLeftButtonDown"
@@ -87,22 +87,21 @@
                                             </Border>
                                             <Grid>
                                                 <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="*"/>
                                                     <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
-                                                <StackPanel Margin="0,0,44,0">
-                                                    <TextBlock Text="{Binding ShortDisplayTitle, Mode=OneWay}" FontWeight="SemiBold"
-                                                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Text="{Binding ShortPreview, Mode=OneWay}" Foreground="{StaticResource TextSecondaryBrush}"
-                                                               Margin="0,5,0,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Foreground="{StaticResource TextSecondaryBrush}" Margin="0,7,0,0" FontSize="12"
-                                                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis">
-                                                        <Run Text="{Binding FavoriteMeta, Mode=OneWay}"/>
-                                                        <Run Text=" · "/>
-                                                        <Run Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:g}}"/>
-                                                    </TextBlock>
-                                                </StackPanel>
-                                                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                                                <TextBlock Grid.Row="0" Text="{Binding ShortDisplayTitle, Mode=OneWay}" FontWeight="SemiBold"
+                                                           TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0,0,44,0"/>
+                                                <TextBlock Grid.Row="1" Text="{Binding ShortPreview, Mode=OneWay}" Foreground="{StaticResource TextSecondaryBrush}"
+                                                           Margin="0,5,0,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Row="2" Text="{Binding FavoriteMeta, Mode=OneWay}" Foreground="{StaticResource TextSecondaryBrush}"
+                                                           Margin="0,7,0,0" FontSize="12" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Row="4" Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
+                                                           Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" TextWrapping="NoWrap"/>
+                                                <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
                                                     <Button Content="固定" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="PinItem_Click" Margin="0,0,6,0"
                                                             Visibility="{Binding IsFavoritesView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                                     <Button Content="收藏" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="FavoriteItem_Click" Margin="0,0,6,0"/>
