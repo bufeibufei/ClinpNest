@@ -7,10 +7,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>Assets\clipnest.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\clipnest.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Resource Include="Assets\clipnest.png" />
   </ItemGroup>
 
 </Project>

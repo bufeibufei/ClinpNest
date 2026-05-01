@@ -172,6 +172,12 @@ public partial class MainWindow
         System.Windows.Application.Current.Shutdown();
     }
 
+    private async Task PasteItemAsync(ClipboardItem item)
+    {
+        await _pasteService.PasteAsync(item);
+        await RefreshAsync();
+    }
+
     private async void SearchBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) => await RefreshAsync();
 
     private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
@@ -196,13 +202,37 @@ public partial class MainWindow
         await RefreshAsync();
     }
 
-    private async void FavoriteItem_Click(object sender, RoutedEventArgs e)
+    private async void PasteItem_Click(object sender, RoutedEventArgs e)
     {
         if ((sender as System.Windows.Controls.Button)?.Tag is ClipboardItem item)
         {
-            await _clipboardRepository.ToggleFavoriteAsync(item.Id);
-            await RefreshAsync();
+            await PasteItemAsync(item);
         }
+    }
+
+    private async void FavoriteItem_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as System.Windows.Controls.Button)?.Tag is not ClipboardItem item)
+        {
+            return;
+        }
+
+        var dialog = new FavoriteDialog(item) { Owner = this };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        if (dialog.RemoveFavorite)
+        {
+            await _clipboardRepository.UnfavoriteAsync(item.Id);
+        }
+        else
+        {
+            await _clipboardRepository.SetFavoriteAsync(item.Id, dialog.Alias, dialog.FavoriteTag);
+        }
+
+        await RefreshAsync();
     }
 
     private async void DeleteItem_Click(object sender, RoutedEventArgs e)
@@ -210,24 +240,6 @@ public partial class MainWindow
         if ((sender as System.Windows.Controls.Button)?.Tag is ClipboardItem item)
         {
             await _clipboardRepository.SoftDeleteAsync(item.Id);
-            await RefreshAsync();
-        }
-    }
-
-    private async void ItemsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-    {
-        if (ItemsList.SelectedItem is ClipboardItem item)
-        {
-            await _pasteService.PasteAsync(item);
-            await RefreshAsync();
-        }
-    }
-
-    private async void ItemsList_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-    {
-        if (e.Key == Key.Enter && ItemsList.SelectedItem is ClipboardItem item)
-        {
-            await _pasteService.PasteAsync(item);
             await RefreshAsync();
         }
     }

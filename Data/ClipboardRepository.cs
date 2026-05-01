@@ -12,11 +12,11 @@ public sealed class ClipboardRepository(AppDatabase database)
         command.CommandText = """
             INSERT INTO clipboard_items(
                 content_text, content_hash, source_app, created_at, updated_at,
-                last_used_at, use_count, is_favorite, is_pinned, is_deleted
+                last_used_at, use_count, is_favorite, is_pinned, is_deleted, favorite_alias, favorite_tag
             )
             VALUES(
                 $content_text, $content_hash, $source_app, $created_at, $updated_at,
-                NULL, 0, 0, 0, 0
+                NULL, 0, 0, 0, 0, '', ''
             )
             ON CONFLICT(content_hash) DO UPDATE SET
                 updated_at = excluded.updated_at,
@@ -49,7 +49,8 @@ public sealed class ClipboardRepository(AppDatabase database)
         {
             command.CommandText = """
                 SELECT * FROM clipboard_items
-                WHERE is_deleted = 0 AND (content_text LIKE $query OR source_app LIKE $query)
+                WHERE is_deleted = 0
+                  AND (content_text LIKE $query OR source_app LIKE $query OR favorite_alias LIKE $query OR favorite_tag LIKE $query)
                 ORDER BY is_pinned DESC, is_favorite DESC, updated_at DESC
                 LIMIT $limit
                 """;
@@ -90,6 +91,30 @@ public sealed class ClipboardRepository(AppDatabase database)
         await command.ExecuteNonQueryAsync();
     }
 
+    public async Task SetFavoriteAsync(long id, string alias, string tag)
+    {
+        await using var connection = database.OpenConnection();
+        var command = connection.CreateCommand();
+        command.CommandText = """
+            UPDATE clipboard_items
+            SET is_favorite = 1, favorite_alias = $alias, favorite_tag = $tag
+            WHERE id = $id
+            """;
+        command.Parameters.AddWithValue("$id", id);
+        command.Parameters.AddWithValue("$alias", alias.Trim());
+        command.Parameters.AddWithValue("$tag", tag.Trim());
+        await command.ExecuteNonQueryAsync();
+    }
+
+    public async Task UnfavoriteAsync(long id)
+    {
+        await using var connection = database.OpenConnection();
+        var command = connection.CreateCommand();
+        command.CommandText = "UPDATE clipboard_items SET is_favorite = 0 WHERE id = $id";
+        command.Parameters.AddWithValue("$id", id);
+        await command.ExecuteNonQueryAsync();
+    }
+
     public async Task SoftDeleteAsync(long id)
     {
         await using var connection = database.OpenConnection();
@@ -121,7 +146,9 @@ public sealed class ClipboardRepository(AppDatabase database)
             UseCount = reader.GetInt32(reader.GetOrdinal("use_count")),
             IsFavorite = reader.GetInt32(reader.GetOrdinal("is_favorite")) == 1,
             IsPinned = reader.GetInt32(reader.GetOrdinal("is_pinned")) == 1,
-            IsDeleted = reader.GetInt32(reader.GetOrdinal("is_deleted")) == 1
+            IsDeleted = reader.GetInt32(reader.GetOrdinal("is_deleted")) == 1,
+            FavoriteAlias = reader.GetString(reader.GetOrdinal("favorite_alias")),
+            FavoriteTag = reader.GetString(reader.GetOrdinal("favorite_tag"))
         };
     }
 }

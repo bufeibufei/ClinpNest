@@ -32,7 +32,9 @@ public sealed class AppDatabase
                 use_count INTEGER NOT NULL DEFAULT 0,
                 is_favorite INTEGER NOT NULL DEFAULT 0,
                 is_pinned INTEGER NOT NULL DEFAULT 0,
-                is_deleted INTEGER NOT NULL DEFAULT 0
+                is_deleted INTEGER NOT NULL DEFAULT 0,
+                favorite_alias TEXT NOT NULL DEFAULT '',
+                favorite_tag TEXT NOT NULL DEFAULT ''
             );
 
             CREATE INDEX IF NOT EXISTS idx_clipboard_items_updated
@@ -44,6 +46,26 @@ public sealed class AppDatabase
             );
             """;
         await command.ExecuteNonQueryAsync();
+        await AddColumnIfMissingAsync(connection, "clipboard_items", "favorite_alias", "TEXT NOT NULL DEFAULT ''");
+        await AddColumnIfMissingAsync(connection, "clipboard_items", "favorite_tag", "TEXT NOT NULL DEFAULT ''");
+    }
+
+    private static async Task AddColumnIfMissingAsync(SqliteConnection connection, string table, string column, string definition)
+    {
+        var check = connection.CreateCommand();
+        check.CommandText = $"PRAGMA table_info({table})";
+        await using var reader = await check.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            if (string.Equals(reader.GetString(1), column, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+        }
+
+        var alter = connection.CreateCommand();
+        alter.CommandText = $"ALTER TABLE {table} ADD COLUMN {column} {definition}";
+        await alter.ExecuteNonQueryAsync();
     }
 
     public SqliteConnection OpenConnection()

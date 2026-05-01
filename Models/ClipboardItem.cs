@@ -13,6 +13,10 @@ public sealed class ClipboardItem
     public bool IsFavorite { get; set; }
     public bool IsPinned { get; set; }
     public bool IsDeleted { get; set; }
+    public string FavoriteAlias { get; set; } = string.Empty;
+    public string FavoriteTag { get; set; } = string.Empty;
 
     public string Preview => ContentText.Length <= 180 ? ContentText : ContentText[..180] + "...";
+    public string DisplayTitle => string.IsNullOrWhiteSpace(FavoriteAlias) ? Preview : FavoriteAlias;
+    public string FavoriteMeta => string.IsNullOrWhiteSpace(FavoriteTag) ? SourceApp : $"{FavoriteTag} · {SourceApp}";
 }

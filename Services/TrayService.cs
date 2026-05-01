@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace ClipNest.Services;
@@ -9,9 +10,10 @@ public sealed class TrayService : IDisposable
 
     public TrayService()
     {
+        var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "clipnest.ico");
         _notifyIcon = new NotifyIcon
         {
-            Icon = SystemIcons.Application,
+            Icon = File.Exists(iconPath) ? new Icon(iconPath) : SystemIcons.Application,
             Text = "ClipNest",
             Visible = true
         };
