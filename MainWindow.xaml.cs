@@ -14,6 +14,9 @@ namespace ClipNest;
 
 public partial class MainWindow
 {
+    public static readonly DependencyProperty IsFavoritesViewProperty =
+        DependencyProperty.Register(nameof(IsFavoritesView), typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
+
     private readonly ClipboardRepository _clipboardRepository;
     private readonly SettingsRepository _settingsRepository;
     private readonly ClipboardHistoryService _historyService;
@@ -26,6 +29,7 @@ public partial class MainWindow
     private QuickPanelWindow? _quickPanel;
     private ClipboardItem? _draggedItem;
     private System.Windows.Point _dragStartPoint;
+    private bool _isDragging;
     private bool _favoritesOnly;
     private bool _isExiting;
 
@@ -64,6 +68,12 @@ public partial class MainWindow
         _trayService.ClearRequested += async (_, _) => await Dispatcher.InvokeAsync(ClearAsync);
         _trayService.ExitRequested += (_, _) => Dispatcher.Invoke(ExitApplication);
         _trayService.BuildMenu(() => _historyService.IsPaused);
+    }
+
+    public bool IsFavoritesView
+    {
+        get => (bool)GetValue(IsFavoritesViewProperty);
+        set => SetValue(IsFavoritesViewProperty, value);
     }
 
     private async void MainWindow_SourceInitialized(object? sender, EventArgs e)
@@ -182,7 +192,7 @@ public partial class MainWindow
         await RefreshAsync();
     }
 
-    private async void SearchBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) => await RefreshAsync();
+    private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => await RefreshAsync();
 
     private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
 
@@ -195,6 +205,7 @@ public partial class MainWindow
     private async void HistoryButton_Click(object sender, RoutedEventArgs e)
     {
         _favoritesOnly = false;
+        IsFavoritesView = false;
         PageTitle.Text = "历史";
         await RefreshAsync();
     }
@@ -202,16 +213,9 @@ public partial class MainWindow
     private async void FavoritesButton_Click(object sender, RoutedEventArgs e)
     {
         _favoritesOnly = true;
+        IsFavoritesView = true;
         PageTitle.Text = "收藏";
         await RefreshAsync();
-    }
-
-    private async void PasteItem_Click(object sender, RoutedEventArgs e)
-    {
-        if ((sender as System.Windows.Controls.Button)?.Tag is ClipboardItem item)
-        {
-            await PasteItemAsync(item);
-        }
     }
 
     private async void FavoriteItem_Click(object sender, RoutedEventArgs e)
@@ -262,6 +266,7 @@ public partial class MainWindow
     {
         _dragStartPoint = e.GetPosition(null);
         _draggedItem = (sender as FrameworkElement)?.Tag as ClipboardItem;
+        _isDragging = false;
     }
 
     private void ItemCard_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
@@ -280,9 +285,24 @@ public partial class MainWindow
 
         if (sender is Border card)
         {
+            _isDragging = true;
             AnimateCard(card, 0.94, 0.58);
             System.Windows.DragDrop.DoDragDrop(card, _draggedItem, System.Windows.DragDropEffects.Move);
             AnimateCard(card, 1, 1);
+        }
+    }
+
+    private async void ItemCard_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (_isDragging || IsActionElement(e.OriginalSource as DependencyObject))
+        {
+            _isDragging = false;
+            return;
+        }
+
+        if ((sender as FrameworkElement)?.Tag is ClipboardItem item)
+        {
+            await PasteItemAsync(item);
         }
     }
 
@@ -336,11 +356,12 @@ public partial class MainWindow
     private void ItemsList_Drop(object sender, System.Windows.DragEventArgs e)
     {
         _draggedItem = null;
+        _isDragging = false;
     }
 
     private static void AnimateCard(Border card, double scale, double opacity)
     {
-        if (card.RenderTransform is not ScaleTransform transform)
+        if (card.RenderTransform is not ScaleTransform transform || transform.IsFrozen)
         {
             transform = new ScaleTransform(1, 1);
             card.RenderTransform = transform;
@@ -350,5 +371,20 @@ public partial class MainWindow
         transform.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(scale, duration));
         transform.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(scale, duration));
         card.BeginAnimation(OpacityProperty, new DoubleAnimation(opacity, duration));
+    }
+
+    private static bool IsActionElement(DependencyObject? source)
+    {
+        while (source is not null)
+        {
+            if (source is System.Windows.Controls.Button)
+            {
+                return true;
+            }
+
+            source = VisualTreeHelper.GetParent(source);
+        }
+
+        return false;
     }
 }

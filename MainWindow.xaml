@@ -71,6 +71,7 @@
                                             RenderTransformOrigin="0.5,0.5"
                                             PreviewMouseLeftButtonDown="ItemCard_PreviewMouseLeftButtonDown"
                                             MouseMove="ItemCard_MouseMove"
+                                            MouseLeftButtonUp="ItemCard_MouseLeftButtonUp"
                                             DragEnter="ItemCard_DragEnter"
                                             DragLeave="ItemCard_DragLeave"
                                             DragOver="ItemCard_DragOver"
@@ -84,7 +85,7 @@
                                                     Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibilityConverter}}">
                                                 <TextBlock Text="固定" Foreground="White" FontSize="11"/>
                                             </Border>
-                                            <Grid Margin="0,0,0,0">
+                                            <Grid>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="*"/>
                                                     <RowDefinition Height="Auto"/>
@@ -102,8 +103,8 @@
                                                     </TextBlock>
                                                 </StackPanel>
                                                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
-                                                    <Button Content="粘贴" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="PasteItem_Click" Margin="0,0,6,0"/>
-                                                    <Button Content="固定" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="PinItem_Click" Margin="0,0,6,0"/>
+                                                    <Button Content="固定" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="PinItem_Click" Margin="0,0,6,0"
+                                                            Visibility="{Binding IsFavoritesView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                                     <Button Content="收藏" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="FavoriteItem_Click" Margin="0,0,6,0"/>
                                                     <Button Content="删除" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="DeleteItem_Click"/>
                                                 </StackPanel>
