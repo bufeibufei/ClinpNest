@@ -1,7 +1,10 @@
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using ClipNest.Data;
 using ClipNest.Models;
 using ClipNest.Services;
@@ -122,7 +125,6 @@ public partial class MainWindow
     private void ShowQuickPanel()
     {
         _quickPanel ??= new QuickPanelWindow(_clipboardRepository, _pasteService);
-        _quickPanel.Owner = this;
         _quickPanel.ShowPanel();
     }
 
@@ -276,7 +278,30 @@ public partial class MainWindow
             return;
         }
 
-        System.Windows.DragDrop.DoDragDrop((DependencyObject)sender, _draggedItem, System.Windows.DragDropEffects.Move);
+        if (sender is Border card)
+        {
+            AnimateCard(card, 0.94, 0.58);
+            System.Windows.DragDrop.DoDragDrop(card, _draggedItem, System.Windows.DragDropEffects.Move);
+            AnimateCard(card, 1, 1);
+        }
+    }
+
+    private void ItemCard_DragEnter(object sender, System.Windows.DragEventArgs e)
+    {
+        if (_favoritesOnly && sender is Border card)
+        {
+            AnimateCard(card, 1.035, 1);
+            card.BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(37, 99, 235));
+        }
+    }
+
+    private void ItemCard_DragLeave(object sender, System.Windows.DragEventArgs e)
+    {
+        if (sender is Border card)
+        {
+            AnimateCard(card, 1, 1);
+            card.BorderBrush = (System.Windows.Media.Brush)FindResource("BorderBrushSoft");
+        }
     }
 
     private void ItemCard_DragOver(object sender, System.Windows.DragEventArgs e)
@@ -311,5 +336,19 @@ public partial class MainWindow
     private void ItemsList_Drop(object sender, System.Windows.DragEventArgs e)
     {
         _draggedItem = null;
+    }
+
+    private static void AnimateCard(Border card, double scale, double opacity)
+    {
+        if (card.RenderTransform is not ScaleTransform transform)
+        {
+            transform = new ScaleTransform(1, 1);
+            card.RenderTransform = transform;
+        }
+
+        var duration = TimeSpan.FromMilliseconds(120);
+        transform.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(scale, duration));
+        transform.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(scale, duration));
+        card.BeginAnimation(OpacityProperty, new DoubleAnimation(opacity, duration));
     }
 }

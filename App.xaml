@@ -4,6 +4,7 @@
              xmlns:services="clr-namespace:ClipNest.Services">
     <Application.Resources>
         <services:CardWidthConverter x:Key="CardWidthConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
         <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#F7F7FA"/>
         <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#FEFEFF"/>

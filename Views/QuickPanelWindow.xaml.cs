@@ -35,48 +35,30 @@ public partial class QuickPanelWindow
         Show();
         Activate();
         SearchBox.Focus();
-        SelectFirstAvailable();
     }
 
     private async Task RefreshAsync()
     {
-        var results = await _clipboardRepository.SearchAsync(SearchBox.Text, 80);
+        var results = await _clipboardRepository.SearchAsync(SearchBox.Text, 96);
         _favorites.Clear();
         _history.Clear();
 
-        foreach (var item in results.Where(item => item.IsFavorite).Take(20))
+        foreach (var item in results.Where(item => item.IsFavorite).Take(24))
         {
             _favorites.Add(item);
         }
 
-        foreach (var item in results.Where(item => !item.IsFavorite).Take(40))
+        foreach (var item in results.Where(item => !item.IsFavorite).Take(48))
         {
             _history.Add(item);
         }
-
-        SelectFirstAvailable();
     }
 
-    private void SelectFirstAvailable()
-    {
-        if (_favorites.Count > 0)
-        {
-            FavoritesList.SelectedIndex = 0;
-            HistoryList.SelectedIndex = -1;
-        }
-        else if (_history.Count > 0)
-        {
-            HistoryList.SelectedIndex = 0;
-            FavoritesList.SelectedIndex = -1;
-        }
-    }
+    private ClipboardItem? FirstItem()
+        => _favorites.FirstOrDefault() ?? _history.FirstOrDefault();
 
-    private ClipboardItem? SelectedItem()
-        => FavoritesList.SelectedItem as ClipboardItem ?? HistoryList.SelectedItem as ClipboardItem;
-
-    private async Task PasteSelectedAsync()
+    private async Task PasteAsync(ClipboardItem? item)
     {
-        var item = SelectedItem();
         if (item is null)
         {
             return;
@@ -90,45 +72,9 @@ public partial class QuickPanelWindow
 
     private async void SearchBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
-        if (e.Key == Key.Down)
-        {
-            var target = _favorites.Count > 0 ? FavoritesList : HistoryList;
-            if (target.Items.Count > 0)
-            {
-                target.Focus();
-                target.SelectedIndex = Math.Max(0, target.SelectedIndex);
-                e.Handled = true;
-            }
-        }
-        else if (e.Key == Key.Enter)
-        {
-            await PasteSelectedAsync();
-            e.Handled = true;
-        }
-        else if (e.Key == Key.Escape)
-        {
-            Hide();
-            e.Handled = true;
-        }
-    }
-
-    private async void ItemsList_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-    {
-        if (sender is System.Windows.Controls.ListBox list)
-        {
-            if (list == FavoritesList)
-            {
-                HistoryList.SelectedIndex = -1;
-            }
-            else
-            {
-                FavoritesList.SelectedIndex = -1;
-            }
-        }
-
         if (e.Key == Key.Enter)
         {
-            await PasteSelectedAsync();
+            await PasteAsync(FirstItem());
             e.Handled = true;
         }
         else if (e.Key == Key.Escape)
@@ -138,21 +84,9 @@ public partial class QuickPanelWindow
         }
     }
 
-    private async void ItemsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private async void ItemCard_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (sender is System.Windows.Controls.ListBox list)
-        {
-            if (list == FavoritesList)
-            {
-                HistoryList.SelectedIndex = -1;
-            }
-            else
-            {
-                FavoritesList.SelectedIndex = -1;
-            }
-        }
-
-        await PasteSelectedAsync();
+        await PasteAsync((sender as FrameworkElement)?.Tag as ClipboardItem);
     }
 
     private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

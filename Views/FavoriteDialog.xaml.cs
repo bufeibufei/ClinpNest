@@ -37,7 +37,13 @@ public partial class FavoriteDialog
 
     private void AddTagButton_Click(object sender, RoutedEventArgs e)
     {
-        var tag = TagBox.Text.Trim();
+        var dialog = new AddTagDialog { Owner = this };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        var tag = dialog.TagName;
         if (string.IsNullOrWhiteSpace(tag) || TagBox.Items.Contains(tag))
         {
             return;

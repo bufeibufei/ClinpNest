@@ -64,39 +64,58 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Tag="{Binding}" Padding="10" Margin="0,0,10,10" Background="#FFFFFF"
+                                    <Border x:Name="Card" Tag="{Binding}" Padding="10" Margin="0,0,10,10" Background="#FFFFFF"
                                             BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="8"
                                             Width="230" Height="126"
                                             ToolTip="{Binding ContentText, Mode=OneWay}"
+                                            RenderTransformOrigin="0.5,0.5"
                                             PreviewMouseLeftButtonDown="ItemCard_PreviewMouseLeftButtonDown"
                                             MouseMove="ItemCard_MouseMove"
+                                            DragEnter="ItemCard_DragEnter"
+                                            DragLeave="ItemCard_DragLeave"
                                             DragOver="ItemCard_DragOver"
                                             Drop="ItemCard_Drop">
+                                        <Border.RenderTransform>
+                                            <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                        </Border.RenderTransform>
                                         <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding ShortDisplayTitle, Mode=OneWay}" FontWeight="SemiBold"
-                                                           TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Text="{Binding ShortPreview, Mode=OneWay}" Foreground="{StaticResource TextSecondaryBrush}"
-                                                           Margin="0,5,0,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Foreground="{StaticResource TextSecondaryBrush}" Margin="0,7,0,0" FontSize="12"
-                                                           TextWrapping="NoWrap" TextTrimming="CharacterEllipsis">
-                                                    <Run Text="{Binding FavoriteMeta, Mode=OneWay}"/>
-                                                    <Run Text=" · "/>
-                                                    <Run Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:g}}"/>
-                                                </TextBlock>
-                                            </StackPanel>
-                                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
-                                                <Button Content="粘贴" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="PasteItem_Click" Margin="0,0,6,0"/>
-                                                <Button Content="固定" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="PinItem_Click" Margin="0,0,6,0"/>
-                                                <Button Content="收藏" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="FavoriteItem_Click" Margin="0,0,6,0"/>
-                                                <Button Content="删除" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="DeleteItem_Click"/>
-                                            </StackPanel>
+                                            <Border HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                    Background="#2563EB" CornerRadius="7" Padding="6,1"
+                                                    Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <TextBlock Text="固定" Foreground="White" FontSize="11"/>
+                                            </Border>
+                                            <Grid Margin="0,0,0,0">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <StackPanel Margin="0,0,44,0">
+                                                    <TextBlock Text="{Binding ShortDisplayTitle, Mode=OneWay}" FontWeight="SemiBold"
+                                                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding ShortPreview, Mode=OneWay}" Foreground="{StaticResource TextSecondaryBrush}"
+                                                               Margin="0,5,0,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Foreground="{StaticResource TextSecondaryBrush}" Margin="0,7,0,0" FontSize="12"
+                                                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis">
+                                                        <Run Text="{Binding FavoriteMeta, Mode=OneWay}"/>
+                                                        <Run Text=" · "/>
+                                                        <Run Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:g}}"/>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                                                    <Button Content="粘贴" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="PasteItem_Click" Margin="0,0,6,0"/>
+                                                    <Button Content="固定" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="PinItem_Click" Margin="0,0,6,0"/>
+                                                    <Button Content="收藏" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="FavoriteItem_Click" Margin="0,0,6,0"/>
+                                                    <Button Content="删除" MinHeight="26" Padding="9,2" Tag="{Binding}" Click="DeleteItem_Click"/>
+                                                </StackPanel>
+                                            </Grid>
                                         </Grid>
                                     </Border>
+                                    <DataTemplate.Triggers>
+                                        <Trigger SourceName="Card" Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Card" Property="BorderBrush" Value="#B8C7F8"/>
+                                            <Setter TargetName="Card" Property="Background" Value="#FAFCFF"/>
+                                        </Trigger>
+                                    </DataTemplate.Triggers>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>

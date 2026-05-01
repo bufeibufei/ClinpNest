@@ -14,7 +14,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Text="收藏条目" FontSize="24" FontWeight="SemiBold"/>
-        <TextBlock Grid.Row="1" Text="设置别名，并从下拉框选择或新增一个分类 tag。"
+        <TextBlock Grid.Row="1" Text="设置别名，并从下拉框选择分类 tag。"
                    Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,20"/>
 
         <StackPanel Grid.Row="2">
@@ -23,7 +23,7 @@
             <TextBlock Text="分类 tag" Margin="0,16,0,6"/>
             <DockPanel>
                 <Button DockPanel.Dock="Right" Content="添加" Margin="8,0,0,0" Click="AddTagButton_Click"/>
-                <ComboBox x:Name="TagBox" IsEditable="True" MinHeight="34"/>
+                <ComboBox x:Name="TagBox" IsEditable="False" MinHeight="34"/>
             </DockPanel>
         </StackPanel>
 
