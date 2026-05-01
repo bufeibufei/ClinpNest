@@ -23,7 +23,7 @@
             <TextBlock Text="分类" Margin="0,16,0,6"/>
             <DockPanel>
                 <Button DockPanel.Dock="Right" Content="添加" Margin="8,0,0,0" Click="AddTagButton_Click"/>
-                <ComboBox x:Name="TagBox" IsEditable="False" MinHeight="34"/>
+                <ComboBox x:Name="TagBox" IsEditable="False" MinHeight="36" Background="#FFFFFF" BorderBrush="{StaticResource BorderBrushSoft}"/>
             </DockPanel>
         </StackPanel>
 
