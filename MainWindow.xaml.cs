@@ -83,6 +83,7 @@ public partial class MainWindow
         _monitorService.Attach(helper);
         _hotkeyService.Attach(helper);
         TryRegisterHotkey(_hotkeySettings, showMessage: true);
+        await LoadCategoriesAsync();
         await RefreshAsync();
     }
 
@@ -100,6 +101,12 @@ public partial class MainWindow
     private async Task RefreshAsync()
     {
         var results = await _clipboardRepository.SearchAsync(SearchBox.Text, favoritesOnly: _favoritesOnly);
+        var selectedCategory = SelectedCategory();
+        if (!string.IsNullOrWhiteSpace(selectedCategory))
+        {
+            results = results.Where(item => string.Equals(item.FavoriteTag, selectedCategory, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
         _items.Clear();
         foreach (var item in results)
         {
@@ -107,6 +114,27 @@ public partial class MainWindow
         }
 
         PageSubtitle.Text = $"{_items.Count} 条记录 · 快捷键 {_hotkeyService.Current.DisplayText}";
+    }
+
+    private async Task LoadCategoriesAsync()
+    {
+        var previous = CategoryFilterBox.SelectedItem as string;
+        CategoryFilterBox.Items.Clear();
+        CategoryFilterBox.Items.Add("全部分类");
+        foreach (var tag in await _clipboardRepository.GetFavoriteTagsAsync())
+        {
+            CategoryFilterBox.Items.Add(tag);
+        }
+
+        CategoryFilterBox.SelectedItem = !string.IsNullOrWhiteSpace(previous) && CategoryFilterBox.Items.Contains(previous)
+            ? previous
+            : "全部分类";
+    }
+
+    private string? SelectedCategory()
+    {
+        var selected = CategoryFilterBox.SelectedItem as string;
+        return string.IsNullOrWhiteSpace(selected) || selected == "全部分类" ? null : selected;
     }
 
     private void UpdateStatus()
@@ -195,6 +223,8 @@ public partial class MainWindow
 
     private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => await RefreshAsync();
 
+    private async void CategoryFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => await RefreshAsync();
+
     private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
 
     private async void ClearButton_Click(object sender, RoutedEventArgs e) => await ClearAsync();
@@ -242,6 +272,7 @@ public partial class MainWindow
             await _clipboardRepository.SetFavoriteAsync(item.Id, dialog.Alias, dialog.FavoriteTag);
         }
 
+        await LoadCategoriesAsync();
         await RefreshAsync();
     }
 

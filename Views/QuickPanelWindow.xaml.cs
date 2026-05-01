@@ -33,6 +33,7 @@ public partial class QuickPanelWindow
         }
 
         SearchBox.Text = string.Empty;
+        await LoadCategoriesAsync();
         await RefreshAsync();
 
         Left = SystemParameters.WorkArea.Left + (SystemParameters.WorkArea.Width - Width) / 2;
@@ -43,18 +44,45 @@ public partial class QuickPanelWindow
         SearchBox.Focus();
     }
 
+    private async Task LoadCategoriesAsync()
+    {
+        var previous = CategoryFilterBox.SelectedItem as string;
+        CategoryFilterBox.Items.Clear();
+        CategoryFilterBox.Items.Add("全部分类");
+        foreach (var tag in await _clipboardRepository.GetFavoriteTagsAsync())
+        {
+            CategoryFilterBox.Items.Add(tag);
+        }
+
+        CategoryFilterBox.SelectedItem = !string.IsNullOrWhiteSpace(previous) && CategoryFilterBox.Items.Contains(previous)
+            ? previous
+            : "全部分类";
+    }
+
+    private string? SelectedCategory()
+    {
+        var selected = CategoryFilterBox.SelectedItem as string;
+        return string.IsNullOrWhiteSpace(selected) || selected == "全部分类" ? null : selected;
+    }
+
     private async Task RefreshAsync()
     {
-        var results = await _clipboardRepository.SearchAsync(SearchBox.Text, 96);
+        var results = await _clipboardRepository.SearchAsync(SearchBox.Text, 128);
+        var selectedCategory = SelectedCategory();
+        if (!string.IsNullOrWhiteSpace(selectedCategory))
+        {
+            results = results.Where(item => string.Equals(item.FavoriteTag, selectedCategory, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
         _favorites.Clear();
         _history.Clear();
 
-        foreach (var item in results.Where(item => item.IsFavorite).Take(24))
+        foreach (var item in results.Where(item => item.IsFavorite).Take(32))
         {
             _favorites.Add(item);
         }
 
-        foreach (var item in results.Where(item => !item.IsFavorite).Take(48))
+        foreach (var item in results.Where(item => !item.IsFavorite).Take(64))
         {
             _history.Add(item);
         }
@@ -75,6 +103,8 @@ public partial class QuickPanelWindow
     }
 
     private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => await RefreshAsync();
+
+    private async void CategoryFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => await RefreshAsync();
 
     private async void SearchBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
@@ -102,6 +132,4 @@ public partial class QuickPanelWindow
             Hide();
         }
     }
-
-    private void Window_Deactivated(object sender, EventArgs e) => Hide();
 }
