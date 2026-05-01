@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Media3D;
 using ClipNest.Data;
 using ClipNest.Models;
 using ClipNest.Services;
@@ -382,7 +383,7 @@ public partial class MainWindow
                 return true;
             }
 
-            source = VisualTreeHelper.GetParent(source);
+            source = source is Visual or Visual3D ? VisualTreeHelper.GetParent(source) : LogicalTreeHelper.GetParent(source);
         }
 
         return false;

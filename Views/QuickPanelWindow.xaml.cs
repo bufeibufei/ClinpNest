@@ -26,6 +26,12 @@ public partial class QuickPanelWindow
 
     public async void ShowPanel()
     {
+        if (IsVisible)
+        {
+            Hide();
+            return;
+        }
+
         SearchBox.Text = string.Empty;
         await RefreshAsync();
 
