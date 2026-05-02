@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="ClipNest"
         Height="760"
-        Width="1280"
+        Width="1360"
         MinHeight="640"
         MinWidth="980"
         Icon="Assets/clipnest.png"
@@ -58,11 +58,11 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="226"/>
+            <ColumnDefinition Width="260"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Background="#F2F7FF" Padding="20,24">
+        <Border Grid.Column="0" Background="#F2F7FF" Padding="24,28">
             <DockPanel LastChildFill="True">
                 <StackPanel DockPanel.Dock="Top">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,30">
@@ -143,7 +143,7 @@
             </DockPanel>
         </Border>
 
-        <Border Grid.Column="1" Margin="0" Background="#F8FBFF" CornerRadius="18,0,0,18" Padding="26,26,30,22" BorderBrush="#E6EEF9" BorderThickness="1,0,0,0">
+        <Border Grid.Column="1" Margin="0" Background="#F8FBFF" CornerRadius="18,0,0,18" Padding="34,34,38,22" BorderBrush="#E6EEF9" BorderThickness="1,0,0,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -152,7 +152,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <DockPanel Margin="0,0,0,18">
+                <DockPanel Margin="0,0,0,24">
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                         <Border x:Name="PageIconBadge" Width="38" Height="38" CornerRadius="19" Background="#EAF3FF" Margin="0,0,12,0">
                             <TextBlock x:Name="PageIconText" FontFamily="Segoe MDL2 Assets" Text="&#xE81C;" Foreground="#2F7DF6" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -179,13 +179,13 @@
                     </StackPanel>
                 </DockPanel>
 
-                <Grid Grid.Row="1" Margin="0,0,0,18">
+                <Grid Grid.Row="1" Margin="0,0,0,20">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition x:Name="CategoryColumn" Width="220"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="0" Height="42" Background="#FFFFFF" BorderBrush="#DDE7F3" BorderThickness="1" CornerRadius="10" Margin="0,0,12,0">
+                    <Border Grid.Column="0" Height="44" Background="#FFFFFF" BorderBrush="#C9D8EF" BorderThickness="1" CornerRadius="10" Margin="0,0,14,0">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="40"/>
@@ -206,8 +206,8 @@
 
                     <ComboBox x:Name="CategoryFilterBox"
                               Grid.Column="1"
-                              Height="42"
-                              Margin="0,0,12,0"
+                              Height="44"
+                              Margin="0,0,14,0"
                               SelectionChanged="CategoryFilterBox_SelectionChanged"/>
 
                 </Grid>
@@ -224,9 +224,9 @@
                                 <Border x:Name="Card"
                                         Tag="{Binding}"
                                         Width="{Binding CardWidth, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        Height="138"
-                                        Padding="14"
-                                        Margin="0,0,14,14"
+                                        Height="146"
+                                        Padding="16"
+                                        Margin="0,0,16,16"
                                         Background="#FFFFFF"
                                         BorderBrush="#E1E9F5"
                                         BorderThickness="1"
@@ -255,19 +255,19 @@
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
 
-                                        <Border Height="3" Background="#2F7DF6" CornerRadius="2" VerticalAlignment="Top" Margin="-14,-14,-14,0"/>
+                                        <Border Height="3" Background="#2F7DF6" CornerRadius="2" VerticalAlignment="Top" Margin="-16,-16,-16,0"/>
 
                                         <Border HorizontalAlignment="Right"
                                                 VerticalAlignment="Top"
                                                 Background="#2F7DF6"
                                                 CornerRadius="0,10,0,8"
                                                 Padding="7,4"
-                                                Margin="0,-14,-14,0"
+                                                Margin="0,-16,-16,0"
                                                 Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE718;" Foreground="White" FontSize="13"/>
                                         </Border>
 
-                                        <Grid Grid.Row="0" Margin="0,8,0,0">
+                                        <Grid Grid.Row="0" Margin="0,10,0,0">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition x:Name="TypeIconColumn" Width="0"/>
                                                 <ColumnDefinition Width="*"/>
@@ -310,7 +310,8 @@
                                                         Margin="0,0,8,0"
                                                         ToolTip="固定"
                                                         Visibility="{Binding IsFavoritesView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                                <Button Content="&#xE734;"
+                                                <Button x:Name="FavoriteButton"
+                                                        Content="&#xE734;"
                                                         Style="{StaticResource IconButtonStyle}"
                                                         Tag="{Binding}"
                                                         Click="FavoriteItem_Click"
@@ -327,9 +328,14 @@
                                 </Border>
                                 <DataTemplate.Triggers>
                                     <DataTrigger Binding="{Binding IsFavoritesView, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                                        <Setter TargetName="Card" Property="Height" Value="154"/>
+                                        <Setter TargetName="Card" Property="Height" Value="166"/>
                                         <Setter TargetName="TypeIconColumn" Property="Width" Value="44"/>
                                         <Setter TargetName="TypeIcon" Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                        <Setter TargetName="FavoriteButton" Property="Foreground" Value="#F59E0B"/>
+                                        <Setter TargetName="FavoriteButton" Property="BorderBrush" Value="#FDE7B2"/>
+                                        <Setter TargetName="FavoriteButton" Property="Background" Value="#FFF8E6"/>
                                     </DataTrigger>
                                     <Trigger SourceName="Card" Property="IsMouseOver" Value="True">
                                         <Setter TargetName="Card" Property="BorderBrush" Value="#BFD1F7"/>

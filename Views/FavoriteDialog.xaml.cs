@@ -17,6 +17,8 @@ public partial class FavoriteDialog
         TagBox.Text = item.FavoriteTag;
         PreviewText.Text = item.Preview;
         PreviewText.ToolTip = item.ContentText;
+        PreviewTimeText.Text = item.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+        PreviewSourceText.Text = item.SourceApp;
         RemoveButton.Visibility = item.IsFavorite ? Visibility.Visible : Visibility.Collapsed;
     }
 

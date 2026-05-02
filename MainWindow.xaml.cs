@@ -203,9 +203,9 @@ public partial class MainWindow
         const double gap = 14;
         var targetColumns = availableWidth switch
         {
-            < 520 => 1,
-            < 820 => 2,
-            < 1120 => 3,
+            < 560 => 1,
+            < 900 => 2,
+            < 1240 => 3,
             _ => 4
         };
 

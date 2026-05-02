@@ -14,9 +14,9 @@ public sealed class CardWidthConverter : IValueConverter
 
         var columns = width switch
         {
-            < 480 => 1,
-            < 760 => 2,
-            < 1040 => 3,
+            < 520 => 1,
+            < 860 => 2,
+            < 1220 => 3,
             _ => 4
         };
 
