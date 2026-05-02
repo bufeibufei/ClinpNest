@@ -18,6 +18,12 @@ public partial class MainWindow
     public static readonly DependencyProperty IsFavoritesViewProperty =
         DependencyProperty.Register(nameof(IsFavoritesView), typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
 
+    public static readonly DependencyProperty IsListViewProperty =
+        DependencyProperty.Register(nameof(IsListView), typeof(bool), typeof(MainWindow), new PropertyMetadata(false, (_, _) => { }));
+
+    public static readonly DependencyProperty CardWidthProperty =
+        DependencyProperty.Register(nameof(CardWidth), typeof(double), typeof(MainWindow), new PropertyMetadata(260d));
+
     private readonly ClipboardRepository _clipboardRepository;
     private readonly SettingsRepository _settingsRepository;
     private readonly ClipboardHistoryService _historyService;
@@ -34,6 +40,7 @@ public partial class MainWindow
     private bool _favoritesOnly;
     private bool _isExiting;
     private int _historyLimit = 100;
+    private int _gridColumns = 3;
 
     public MainWindow(
         ClipboardRepository clipboardRepository,
@@ -78,6 +85,18 @@ public partial class MainWindow
     {
         get => (bool)GetValue(IsFavoritesViewProperty);
         set => SetValue(IsFavoritesViewProperty, value);
+    }
+
+    public bool IsListView
+    {
+        get => (bool)GetValue(IsListViewProperty);
+        set => SetValue(IsListViewProperty, value);
+    }
+
+    public double CardWidth
+    {
+        get => (double)GetValue(CardWidthProperty);
+        set => SetValue(CardWidthProperty, value);
     }
 
     private async void MainWindow_SourceInitialized(object? sender, EventArgs e)
@@ -176,6 +195,75 @@ public partial class MainWindow
         PageIconText.Foreground = favoritesOnly
             ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(245, 158, 11))
             : new SolidColorBrush(System.Windows.Media.Color.FromRgb(47, 125, 246));
+        UpdateCardWidth();
+        UpdateViewModeButtons();
+    }
+
+    private void SetListView(bool isListView)
+    {
+        IsListView = isListView;
+        UpdateCardWidth();
+        UpdateViewModeButtons();
+    }
+
+    private void UpdateCardWidth()
+    {
+        if (ItemsList is null)
+        {
+            return;
+        }
+
+        var availableWidth = ItemsList.ActualWidth;
+        if (availableWidth <= 0)
+        {
+            return;
+        }
+
+        const double gap = 14;
+        if (IsListView)
+        {
+            CardWidth = Math.Max(240, Math.Floor(availableWidth - gap));
+            return;
+        }
+
+        var targetColumns = availableWidth switch
+        {
+            < 520 => 1,
+            < 820 => 2,
+            < 1120 => 3,
+            _ => 4
+        };
+
+        if (targetColumns > _gridColumns && availableWidth < targetColumns * 250 + (targetColumns - 1) * gap + 28)
+        {
+            targetColumns = _gridColumns;
+        }
+        else if (targetColumns < _gridColumns && availableWidth > _gridColumns * 220 + (_gridColumns - 1) * gap - 28)
+        {
+            targetColumns = _gridColumns;
+        }
+
+        _gridColumns = Math.Clamp(targetColumns, 1, 4);
+        CardWidth = Math.Max(220, Math.Floor((availableWidth - gap * _gridColumns) / _gridColumns));
+    }
+
+    private void UpdateViewModeButtons()
+    {
+        if (GridViewButton is null || ListViewButton is null)
+        {
+            return;
+        }
+
+        var activeBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(47, 125, 246));
+        var inactiveBackground = new SolidColorBrush(System.Windows.Media.Colors.White);
+        var activeBorder = new SolidColorBrush(System.Windows.Media.Color.FromRgb(47, 125, 246));
+        var inactiveBorder = new SolidColorBrush(System.Windows.Media.Color.FromRgb(223, 231, 242));
+        GridViewButton.Background = IsListView ? inactiveBackground : activeBackground;
+        GridViewButton.BorderBrush = IsListView ? inactiveBorder : activeBorder;
+        GridViewButton.Foreground = IsListView ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(102, 112, 133)) : System.Windows.Media.Brushes.White;
+        ListViewButton.Background = IsListView ? activeBackground : inactiveBackground;
+        ListViewButton.BorderBrush = IsListView ? activeBorder : inactiveBorder;
+        ListViewButton.Foreground = IsListView ? System.Windows.Media.Brushes.White : new SolidColorBrush(System.Windows.Media.Color.FromRgb(102, 112, 133));
     }
 
     private void TryRegisterHotkey(HotkeySettings settings, bool showMessage)
@@ -279,6 +367,12 @@ public partial class MainWindow
     private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e) => OpenSettings();
+
+    private void GridViewButton_Click(object sender, RoutedEventArgs e) => SetListView(false);
+
+    private void ListViewButton_Click(object sender, RoutedEventArgs e) => SetListView(true);
+
+    private void ItemsList_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateCardWidth();
 
     private async void HistoryButton_Click(object sender, RoutedEventArgs e)
     {

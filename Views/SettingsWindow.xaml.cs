@@ -11,6 +11,7 @@ public partial class SettingsWindow
 
     public SettingsWindow(HotkeySettings current, int historyLimit)
     {
+        _syncingLimit = true;
         InitializeComponent();
         _current = current;
         SelectedHotkey = current;
@@ -19,6 +20,7 @@ public partial class SettingsWindow
         HistoryLimitSlider.Value = HistoryLimit;
         HistoryLimitBox.Text = HistoryLimit.ToString();
         HintText.Text = "建议保留至少两个修饰键，避免和系统快捷键冲突。";
+        _syncingLimit = false;
     }
 
     public HotkeySettings? SelectedHotkey { get; private set; }
@@ -77,6 +79,11 @@ public partial class SettingsWindow
     private void SetHistoryLimit(int value)
     {
         HistoryLimit = ClampHistoryLimit(value);
+        if (HistoryLimitSlider is null || HistoryLimitBox is null)
+        {
+            return;
+        }
+
         _syncingLimit = true;
         HistoryLimitSlider.Value = HistoryLimit;
         HistoryLimitBox.Text = HistoryLimit.ToString();
