@@ -170,7 +170,7 @@ public partial class MainWindow
         ClearButtonText.Text = favoritesOnly ? "清空收藏" : "清空";
         StatusText.Text = _historyService.IsPaused ? "当前已暂停记录。" : (favoritesOnly ? "总剪切板历史" : "剪切板历史");
 
-        CategoryColumn.Width = favoritesOnly ? new GridLength(220) : new GridLength(0);
+        CategoryColumn.Width = favoritesOnly ? new GridLength(190) : new GridLength(0);
         CategoryFilterBox.Visibility = favoritesOnly ? Visibility.Visible : Visibility.Collapsed;
         PaginationBar.Visibility = favoritesOnly ? Visibility.Visible : Visibility.Collapsed;
 
@@ -200,26 +200,26 @@ public partial class MainWindow
             return;
         }
 
-        const double gap = 14;
-        var targetColumns = availableWidth switch
-        {
-            < 560 => 1,
-            < 900 => 2,
-            < 1240 => 3,
-            _ => 4
-        };
+        const double gap = 12;
+        const double targetCardWidth = 232;
+        var targetColumns = Math.Clamp(
+            (int)Math.Floor((availableWidth + gap) / (targetCardWidth + gap)),
+            1,
+            4);
 
-        if (targetColumns > _gridColumns && availableWidth < targetColumns * 250 + (targetColumns - 1) * gap + 28)
+        var currentMinimum = _gridColumns * 214 + (_gridColumns - 1) * gap;
+        var nextMinimum = Math.Min(4, _gridColumns + 1) * 224 + Math.Max(0, _gridColumns) * gap + 36;
+        if (targetColumns < _gridColumns && availableWidth >= currentMinimum)
         {
             targetColumns = _gridColumns;
         }
-        else if (targetColumns < _gridColumns && availableWidth > _gridColumns * 220 + (_gridColumns - 1) * gap - 28)
+        else if (targetColumns > _gridColumns && availableWidth < nextMinimum)
         {
             targetColumns = _gridColumns;
         }
 
         _gridColumns = Math.Clamp(targetColumns, 1, 4);
-        CardWidth = Math.Max(220, Math.Floor((availableWidth - gap * _gridColumns) / _gridColumns));
+        CardWidth = Math.Max(210, Math.Floor((availableWidth - gap * (_gridColumns - 1)) / _gridColumns));
     }
 
     private void TryRegisterHotkey(HotkeySettings settings, bool showMessage)
