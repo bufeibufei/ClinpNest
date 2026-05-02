@@ -18,9 +18,6 @@ public partial class MainWindow
     public static readonly DependencyProperty IsFavoritesViewProperty =
         DependencyProperty.Register(nameof(IsFavoritesView), typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
 
-    public static readonly DependencyProperty IsListViewProperty =
-        DependencyProperty.Register(nameof(IsListView), typeof(bool), typeof(MainWindow), new PropertyMetadata(false, (_, _) => { }));
-
     public static readonly DependencyProperty CardWidthProperty =
         DependencyProperty.Register(nameof(CardWidth), typeof(double), typeof(MainWindow), new PropertyMetadata(260d));
 
@@ -85,12 +82,6 @@ public partial class MainWindow
     {
         get => (bool)GetValue(IsFavoritesViewProperty);
         set => SetValue(IsFavoritesViewProperty, value);
-    }
-
-    public bool IsListView
-    {
-        get => (bool)GetValue(IsListViewProperty);
-        set => SetValue(IsListViewProperty, value);
     }
 
     public double CardWidth
@@ -180,9 +171,7 @@ public partial class MainWindow
         StatusText.Text = _historyService.IsPaused ? "当前已暂停记录。" : (favoritesOnly ? "总剪切板历史" : "剪切板历史");
 
         CategoryColumn.Width = favoritesOnly ? new GridLength(220) : new GridLength(0);
-        ViewModeColumn.Width = favoritesOnly ? new GridLength(112) : new GridLength(0);
         CategoryFilterBox.Visibility = favoritesOnly ? Visibility.Visible : Visibility.Collapsed;
-        ViewModeButtons.Visibility = favoritesOnly ? Visibility.Visible : Visibility.Collapsed;
         PaginationBar.Visibility = favoritesOnly ? Visibility.Visible : Visibility.Collapsed;
 
         var selectedBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(231, 240, 255));
@@ -196,14 +185,6 @@ public partial class MainWindow
             ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(245, 158, 11))
             : new SolidColorBrush(System.Windows.Media.Color.FromRgb(47, 125, 246));
         UpdateCardWidth();
-        UpdateViewModeButtons();
-    }
-
-    private void SetListView(bool isListView)
-    {
-        IsListView = isListView;
-        UpdateCardWidth();
-        UpdateViewModeButtons();
     }
 
     private void UpdateCardWidth()
@@ -220,12 +201,6 @@ public partial class MainWindow
         }
 
         const double gap = 14;
-        if (IsListView)
-        {
-            CardWidth = Math.Max(240, Math.Floor(availableWidth - gap));
-            return;
-        }
-
         var targetColumns = availableWidth switch
         {
             < 520 => 1,
@@ -247,25 +222,6 @@ public partial class MainWindow
         CardWidth = Math.Max(220, Math.Floor((availableWidth - gap * _gridColumns) / _gridColumns));
     }
 
-    private void UpdateViewModeButtons()
-    {
-        if (GridViewButton is null || ListViewButton is null)
-        {
-            return;
-        }
-
-        var activeBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(47, 125, 246));
-        var inactiveBackground = new SolidColorBrush(System.Windows.Media.Colors.White);
-        var activeBorder = new SolidColorBrush(System.Windows.Media.Color.FromRgb(47, 125, 246));
-        var inactiveBorder = new SolidColorBrush(System.Windows.Media.Color.FromRgb(223, 231, 242));
-        GridViewButton.Background = IsListView ? inactiveBackground : activeBackground;
-        GridViewButton.BorderBrush = IsListView ? inactiveBorder : activeBorder;
-        GridViewButton.Foreground = IsListView ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(102, 112, 133)) : System.Windows.Media.Brushes.White;
-        ListViewButton.Background = IsListView ? activeBackground : inactiveBackground;
-        ListViewButton.BorderBrush = IsListView ? activeBorder : inactiveBorder;
-        ListViewButton.Foreground = IsListView ? System.Windows.Media.Brushes.White : new SolidColorBrush(System.Windows.Media.Color.FromRgb(102, 112, 133));
-    }
-
     private void TryRegisterHotkey(HotkeySettings settings, bool showMessage)
     {
         try
@@ -285,7 +241,12 @@ public partial class MainWindow
 
     private void ShowQuickPanel()
     {
-        _quickPanel ??= new QuickPanelWindow(_clipboardRepository, _pasteService);
+        if (_quickPanel is null)
+        {
+            _quickPanel = new QuickPanelWindow(_clipboardRepository, _pasteService);
+            _quickPanel.Closed += (_, _) => _quickPanel = null;
+        }
+
         _quickPanel.ShowPanel();
     }
 
@@ -342,7 +303,7 @@ public partial class MainWindow
     private void ExitApplication()
     {
         _isExiting = true;
-        _quickPanel?.Close();
+        _quickPanel?.ForceClose();
         _monitorService.Dispose();
         _hotkeyService.Dispose();
         _trayService.Dispose();
@@ -367,10 +328,6 @@ public partial class MainWindow
     private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e) => OpenSettings();
-
-    private void GridViewButton_Click(object sender, RoutedEventArgs e) => SetListView(false);
-
-    private void ListViewButton_Click(object sender, RoutedEventArgs e) => SetListView(true);
 
     private void ItemsList_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateCardWidth();
 

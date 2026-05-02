@@ -14,6 +14,7 @@ public partial class QuickPanelWindow
     private readonly PasteService _pasteService;
     private readonly ObservableCollection<ClipboardItem> _favorites = [];
     private readonly ObservableCollection<ClipboardItem> _history = [];
+    private bool _forceClose;
 
     public QuickPanelWindow(ClipboardRepository clipboardRepository, PasteService pasteService)
     {
@@ -22,6 +23,7 @@ public partial class QuickPanelWindow
         _pasteService = pasteService;
         FavoritesList.ItemsSource = _favorites;
         HistoryList.ItemsSource = _history;
+        Closing += QuickPanelWindow_Closing;
     }
 
     public async void ShowPanel()
@@ -42,6 +44,23 @@ public partial class QuickPanelWindow
         Show();
         Activate();
         SearchBox.Focus();
+    }
+
+    public void ForceClose()
+    {
+        _forceClose = true;
+        Close();
+    }
+
+    private void QuickPanelWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+    {
+        if (_forceClose)
+        {
+            return;
+        }
+
+        e.Cancel = true;
+        Hide();
     }
 
     private async Task LoadCategoriesAsync()

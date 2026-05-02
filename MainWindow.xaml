@@ -129,7 +129,7 @@
                         </Grid>
                     </Border>
 
-                    <Grid Margin="10,22,10,0">
+                    <Grid Margin="10,22,10,0" Visibility="Collapsed">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -183,7 +183,6 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition x:Name="CategoryColumn" Width="220"/>
-                        <ColumnDefinition x:Name="ViewModeColumn" Width="112"/>
                     </Grid.ColumnDefinitions>
 
                     <Border Grid.Column="0" Height="42" Background="#FFFFFF" BorderBrush="#DDE7F3" BorderThickness="1" CornerRadius="10" Margin="0,0,12,0">
@@ -211,10 +210,6 @@
                               Margin="0,0,12,0"
                               SelectionChanged="CategoryFilterBox_SelectionChanged"/>
 
-                    <StackPanel x:Name="ViewModeButtons" Grid.Column="2" Orientation="Horizontal">
-                        <Button x:Name="GridViewButton" Style="{StaticResource PrimaryIconButtonStyle}" Content="&#xECA5;" Margin="0,0,8,0" ToolTip="网格视图" Click="GridViewButton_Click"/>
-                        <Button x:Name="ListViewButton" Style="{StaticResource IconButtonStyle}" Content="&#xEA37;" Width="40" Height="40" MinHeight="40" ToolTip="列表视图" Click="ListViewButton_Click"/>
-                    </StackPanel>
                 </Grid>
 
                 <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -331,21 +326,11 @@
                                     </Grid>
                                 </Border>
                                 <DataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding IsListView, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                                        <Setter TargetName="Card" Property="Height" Value="92"/>
-                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding IsFavoritesView, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
                                         <Setter TargetName="Card" Property="Height" Value="154"/>
                                         <Setter TargetName="TypeIconColumn" Property="Width" Value="44"/>
                                         <Setter TargetName="TypeIcon" Property="Visibility" Value="Visible"/>
                                     </DataTrigger>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding IsFavoritesView, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"/>
-                                            <Condition Binding="{Binding IsListView, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"/>
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter TargetName="Card" Property="Height" Value="104"/>
-                                    </MultiDataTrigger>
                                     <Trigger SourceName="Card" Property="IsMouseOver" Value="True">
                                         <Setter TargetName="Card" Property="BorderBrush" Value="#BFD1F7"/>
                                         <Setter TargetName="Card" Property="Background" Value="#FEFFFF"/>
