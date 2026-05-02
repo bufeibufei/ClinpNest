@@ -37,7 +37,7 @@ public partial class MainWindow
     private bool _favoritesOnly;
     private bool _isExiting;
     private int _historyLimit = 100;
-    private int _gridColumns = 3;
+    private int _gridColumns;
 
     public MainWindow(
         ClipboardRepository clipboardRepository,
@@ -201,25 +201,24 @@ public partial class MainWindow
         }
 
         const double gap = 12;
-        const double targetCardWidth = 232;
-        var targetColumns = Math.Clamp(
-            (int)Math.Floor((availableWidth + gap) / (targetCardWidth + gap)),
-            1,
-            4);
+        const double idealCardWidth = 224;
+        const double minCardWidth = 206;
+        var maxColumns = Math.Clamp((int)Math.Floor((availableWidth + gap) / (minCardWidth + gap)), 1, 5);
+        var idealColumns = Math.Clamp((int)Math.Round((availableWidth + gap) / (idealCardWidth + gap)), 1, 5);
+        var columns = Math.Min(maxColumns, idealColumns);
 
-        var currentMinimum = _gridColumns * 214 + (_gridColumns - 1) * gap;
-        var nextMinimum = Math.Min(4, _gridColumns + 1) * 224 + Math.Max(0, _gridColumns) * gap + 36;
-        if (targetColumns < _gridColumns && availableWidth >= currentMinimum)
+        if (_gridColumns > 0 && Math.Abs(columns - _gridColumns) == 1)
         {
-            targetColumns = _gridColumns;
-        }
-        else if (targetColumns > _gridColumns && availableWidth < nextMinimum)
-        {
-            targetColumns = _gridColumns;
+            var currentWidth = (availableWidth - gap * (_gridColumns - 1)) / _gridColumns;
+            var proposedWidth = (availableWidth - gap * (columns - 1)) / columns;
+            if (currentWidth is >= 206 and <= 264 && proposedWidth is >= 206 and <= 264)
+            {
+                columns = _gridColumns;
+            }
         }
 
-        _gridColumns = Math.Clamp(targetColumns, 1, 4);
-        CardWidth = Math.Max(210, Math.Floor((availableWidth - gap * (_gridColumns - 1)) / _gridColumns));
+        _gridColumns = columns;
+        CardWidth = Math.Floor((availableWidth - gap * (columns - 1)) / columns);
     }
 
     private void TryRegisterHotkey(HotkeySettings settings, bool showMessage)

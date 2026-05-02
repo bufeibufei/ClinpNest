@@ -143,7 +143,7 @@
             </DockPanel>
         </Border>
 
-        <Border Grid.Column="1" Margin="0" Background="#F8FBFF" CornerRadius="18,0,0,18" Padding="26,26,30,18" BorderBrush="#E6EEF9" BorderThickness="1,0,0,0">
+        <Border Grid.Column="1" Margin="0" Background="#F8FBFF" CornerRadius="18,0,0,18" Padding="26,26,16,18" BorderBrush="#E6EEF9" BorderThickness="1,0,0,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -179,7 +179,7 @@
                     </StackPanel>
                 </DockPanel>
 
-                <Grid Grid.Row="1" Margin="0,0,0,16">
+                <Grid Grid.Row="1" Margin="0,0,14,16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition x:Name="CategoryColumn" Width="190"/>
@@ -212,7 +212,7 @@
 
                 </Grid>
 
-                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ScrollViewer Grid.Row="2" Padding="0,0,2,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl x:Name="ItemsList" AllowDrop="True" Drop="ItemsList_Drop" SizeChanged="ItemsList_SizeChanged">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>

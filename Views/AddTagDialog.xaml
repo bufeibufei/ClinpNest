@@ -2,37 +2,62 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="添加分类"
-        Height="260"
-        Width="420"
-        MinHeight="260"
-        MinWidth="420"
+        Height="320"
+        Width="520"
+        MinHeight="320"
+        MinWidth="520"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="NoResize">
-    <Grid Background="{StaticResource WindowBackgroundBrush}" Margin="24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        ResizeMode="NoResize"
+        Background="#EEF4FF"
+        KeyDown="Window_KeyDown">
+    <Border Background="#FBFDFF" BorderBrush="#C9D8EF" BorderThickness="1" CornerRadius="16">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="64"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="72"/>
+            </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="添加分类" FontSize="22" FontWeight="SemiBold"/>
-        <TextBlock Grid.Row="1" Text="输入一个新的分类名称。" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,18"/>
-        <TextBlock Grid.Row="2" Text="分类名称" Margin="0,0,0,8"/>
-        <Border Grid.Row="3" Background="#FFFFFF" BorderBrush="#2563EB" BorderThickness="1" CornerRadius="7" Height="42">
-            <TextBox x:Name="TagNameBox"
-                     BorderThickness="0"
-                     Background="Transparent"
-                     Foreground="#202124"
-                     Padding="12,8"
-                     VerticalContentAlignment="Center"/>
-        </Border>
+            <Border Grid.Row="0" BorderBrush="#DDE7F3" BorderThickness="0,0,0,1" Padding="26,0">
+                <DockPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="28" Height="28" CornerRadius="7" Background="#2F7DF6" Margin="0,0,12,0">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" Foreground="White" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="添加分类" FontSize="18" FontWeight="SemiBold" Foreground="#101828" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
 
-        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-            <Button Content="取消" Margin="0,0,8,0" Click="CancelButton_Click"/>
-            <Button Content="添加" Background="#2563EB" Foreground="White" BorderBrush="#2563EB" Click="AddButton_Click"/>
-        </StackPanel>
-    </Grid>
+            <Grid Grid.Row="1" Margin="30,26,30,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="添加分类" FontSize="26" FontWeight="SemiBold" Foreground="#101828"/>
+                <TextBlock Grid.Row="1" Text="输入一个新的分类名称，保存后可在收藏条目时直接选择。" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,22"/>
+                <StackPanel Grid.Row="2">
+                    <TextBlock Text="分类名称" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <Border Background="#FFFFFF" BorderBrush="#B9C9E5" BorderThickness="1" CornerRadius="9" Height="48">
+                        <TextBox x:Name="TagNameBox"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 Foreground="#202124"
+                                 FontSize="15"
+                                 Padding="14,8"
+                                 VerticalContentAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <Border Grid.Row="2" BorderBrush="#DDE7F3" BorderThickness="0,1,0,0" Padding="0,0,30,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button Content="取消" Width="96" Height="40" Margin="0,0,12,0" Click="CancelButton_Click"/>
+                    <Button Content="添加" Width="108" Height="40" Background="#2F7DF6" Foreground="White" BorderBrush="#2F7DF6" Click="AddButton_Click"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
 </Window>

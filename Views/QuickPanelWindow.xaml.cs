@@ -34,8 +34,8 @@ public partial class QuickPanelWindow
             return;
         }
 
+        await LoadCategoriesAsync(resetSelection: true);
         SearchBox.Text = string.Empty;
-        await LoadCategoriesAsync();
         await RefreshAsync();
 
         Left = SystemParameters.WorkArea.Left + (SystemParameters.WorkArea.Width - Width) / 2;
@@ -63,7 +63,7 @@ public partial class QuickPanelWindow
         Hide();
     }
 
-    private async Task LoadCategoriesAsync()
+    private async Task LoadCategoriesAsync(bool resetSelection = false)
     {
         var previous = CategoryFilterBox.SelectedItem as string;
         CategoryFilterBox.Items.Clear();
@@ -73,7 +73,7 @@ public partial class QuickPanelWindow
             CategoryFilterBox.Items.Add(tag);
         }
 
-        CategoryFilterBox.SelectedItem = !string.IsNullOrWhiteSpace(previous) && CategoryFilterBox.Items.Contains(previous)
+        CategoryFilterBox.SelectedItem = !resetSelection && !string.IsNullOrWhiteSpace(previous) && CategoryFilterBox.Items.Contains(previous)
             ? previous
             : "全部分类";
     }
