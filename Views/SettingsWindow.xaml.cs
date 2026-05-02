@@ -7,17 +7,23 @@ namespace ClipNest.Views;
 public partial class SettingsWindow
 {
     private HotkeySettings _current;
+    private bool _syncingLimit;
 
-    public SettingsWindow(HotkeySettings current)
+    public SettingsWindow(HotkeySettings current, int historyLimit)
     {
         InitializeComponent();
         _current = current;
         SelectedHotkey = current;
+        HistoryLimit = ClampHistoryLimit(historyLimit);
         HotkeyBox.Text = current.DisplayText;
+        HistoryLimitSlider.Value = HistoryLimit;
+        HistoryLimitBox.Text = HistoryLimit.ToString();
         HintText.Text = "建议保留至少两个修饰键，避免和系统快捷键冲突。";
     }
 
     public HotkeySettings? SelectedHotkey { get; private set; }
+
+    public int HistoryLimit { get; private set; }
 
     private void HotkeyBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
@@ -48,9 +54,41 @@ public partial class SettingsWindow
         HintText.Text = "保存后立即生效。";
     }
 
+    private void HistoryLimitSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (_syncingLimit)
+        {
+            return;
+        }
+
+        SetHistoryLimit((int)e.NewValue);
+    }
+
+    private void HistoryLimitBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        if (_syncingLimit || !int.TryParse(HistoryLimitBox.Text, out var value))
+        {
+            return;
+        }
+
+        SetHistoryLimit(value);
+    }
+
+    private void SetHistoryLimit(int value)
+    {
+        HistoryLimit = ClampHistoryLimit(value);
+        _syncingLimit = true;
+        HistoryLimitSlider.Value = HistoryLimit;
+        HistoryLimitBox.Text = HistoryLimit.ToString();
+        _syncingLimit = false;
+    }
+
+    private static int ClampHistoryLimit(int value) => Math.Clamp(value, 20, 500);
+
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         SelectedHotkey = _current;
+        SetHistoryLimit(HistoryLimit);
         DialogResult = true;
     }
 

@@ -16,6 +16,8 @@ public sealed class ClipboardHistoryService(
 
     public bool IsPaused { get; set; }
 
+    public int HistoryLimit { get; set; } = 100;
+
     public async Task CaptureCurrentTextAsync()
     {
         if (IsPaused)
@@ -59,6 +61,7 @@ public sealed class ClipboardHistoryService(
             CreatedAt = now,
             UpdatedAt = now
         });
+        await repository.TrimHistoryAsync(HistoryLimit);
 
         Changed?.Invoke(this, EventArgs.Empty);
     }

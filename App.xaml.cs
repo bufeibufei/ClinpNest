@@ -49,6 +49,8 @@ public partial class App
             var pasteService = new PasteService(clipboardRepository);
 
             var savedHotkey = HotkeySettings.Parse(await settingsRepository.GetAsync("quick_panel_hotkey"));
+            var historyLimit = ParseHistoryLimit(await settingsRepository.GetAsync("history_limit"));
+            historyService.HistoryLimit = historyLimit;
 
             _trayService = new TrayService();
             _mainWindow = new MainWindow(
@@ -70,5 +72,10 @@ public partial class App
             System.Windows.MessageBox.Show($"ClipNest 启动失败，日志已写入：\n{AppLogger.LogPath}\n\n{ex.Message}", "ClipNest 启动失败", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown(-1);
         }
+    }
+
+    private static int ParseHistoryLimit(string? value)
+    {
+        return int.TryParse(value, out var limit) && limit is >= 20 and <= 5000 ? limit : 100;
     }
 }

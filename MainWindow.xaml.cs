@@ -33,6 +33,7 @@ public partial class MainWindow
     private bool _isDragging;
     private bool _favoritesOnly;
     private bool _isExiting;
+    private int _historyLimit = 100;
 
     public MainWindow(
         ClipboardRepository clipboardRepository,
@@ -53,6 +54,7 @@ public partial class MainWindow
         _pasteService = pasteService;
         _trayService = trayService;
         _hotkeySettings = hotkeySettings;
+        _historyLimit = _historyService.HistoryLimit;
 
         ItemsList.ItemsSource = _items;
         SearchBox.Text = string.Empty;
@@ -114,8 +116,11 @@ public partial class MainWindow
             _items.Add(item);
         }
 
+        var historyCount = await _clipboardRepository.CountActiveAsync();
         PageSubtitle.Text = $"{_items.Count} 条记录 · 快捷键 {_hotkeyService.Current.DisplayText}";
-        SummaryTitleText.Text = _favoritesOnly ? $"收藏 {_items.Count} 条" : $"记录 {_items.Count} 条";
+        SummaryTitleText.Text = $"{historyCount} / {_historyLimit}";
+        HistoryUsageBar.Maximum = Math.Max(1, _historyLimit);
+        HistoryUsageBar.Value = Math.Min(historyCount, _historyLimit);
     }
 
     private async Task LoadCategoriesAsync()
@@ -212,7 +217,7 @@ public partial class MainWindow
 
     private void OpenSettings()
     {
-        var window = new SettingsWindow(_hotkeySettings)
+        var window = new SettingsWindow(_hotkeySettings, _historyLimit)
         {
             Owner = this
         };
@@ -223,7 +228,11 @@ public partial class MainWindow
         }
 
         TryRegisterHotkey(window.SelectedHotkey, showMessage: false);
+        _historyLimit = window.HistoryLimit;
+        _historyService.HistoryLimit = _historyLimit;
         _ = _settingsRepository.SetAsync("quick_panel_hotkey", window.SelectedHotkey.ToString());
+        _ = _settingsRepository.SetAsync("history_limit", _historyLimit.ToString());
+        _ = _clipboardRepository.TrimHistoryAsync(_historyLimit);
         _ = RefreshAsync();
     }
 

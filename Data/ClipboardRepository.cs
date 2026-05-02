@@ -76,6 +76,14 @@ public sealed class ClipboardRepository(AppDatabase database)
         return result;
     }
 
+    public async Task<int> CountActiveAsync()
+    {
+        await using var connection = database.OpenConnection();
+        var command = connection.CreateCommand();
+        command.CommandText = "SELECT COUNT(*) FROM clipboard_items WHERE is_deleted = 0";
+        return Convert.ToInt32(await command.ExecuteScalarAsync());
+    }
+
     public async Task<IReadOnlyList<string>> GetFavoriteTagsAsync()
     {
         await using var connection = database.OpenConnection();
@@ -222,6 +230,31 @@ public sealed class ClipboardRepository(AppDatabase database)
                 favorited_at = NULL
             WHERE is_favorite = 1
             """;
+        await command.ExecuteNonQueryAsync();
+    }
+
+    public async Task TrimHistoryAsync(int maxItems)
+    {
+        if (maxItems < 1)
+        {
+            maxItems = 1;
+        }
+
+        await using var connection = database.OpenConnection();
+        var command = connection.CreateCommand();
+        command.CommandText = """
+            UPDATE clipboard_items
+            SET is_deleted = 1
+            WHERE id IN (
+                SELECT id
+                FROM clipboard_items
+                WHERE is_deleted = 0
+                  AND is_favorite = 0
+                ORDER BY updated_at DESC
+                LIMIT -1 OFFSET $max_items
+            )
+            """;
+        command.Parameters.AddWithValue("$max_items", maxItems);
         await command.ExecuteNonQueryAsync();
     }
 
