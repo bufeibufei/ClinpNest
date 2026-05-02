@@ -83,7 +83,7 @@
                             <DataTemplate>
                                 <Border x:Name="Card" Tag="{Binding}" Padding="16" Margin="0,0,18,18" Background="#FFFFFF"
                                         BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="10"
-                                        Width="360" Height="158"
+                                        Width="300" Height="158"
                                         ToolTip="{Binding ContentText, Mode=OneWay}"
                                         RenderTransformOrigin="0.5,0.5"
                                         PreviewMouseLeftButtonDown="ItemCard_PreviewMouseLeftButtonDown"
