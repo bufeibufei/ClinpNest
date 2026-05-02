@@ -1,75 +1,222 @@
 <Window x:Class="ClipNest.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ClipNest" Height="760" Width="1280"
-        MinHeight="620" MinWidth="980"
+        Title="ClipNest"
+        Height="820"
+        Width="1360"
+        MinHeight="680"
+        MinWidth="1060"
         Icon="Assets/clipnest.png"
         WindowStartupLocation="CenterScreen"
         Background="#F4F8FF">
+    <Window.Resources>
+        <Style x:Key="SidebarNavButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#1D2433"/>
+        </Style>
+
+        <Style x:Key="HeaderButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="MinWidth" Value="86"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <Style x:Key="IconButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Width" Value="34"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="MinHeight" Value="34"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Foreground" Value="#667085"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#DFE7F2"/>
+        </Style>
+
+        <Style x:Key="PrimaryIconButtonStyle" TargetType="Button" BasedOn="{StaticResource IconButtonStyle}">
+            <Setter Property="Background" Value="#2F7DF6"/>
+            <Setter Property="BorderBrush" Value="#2F7DF6"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Width" Value="44"/>
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="MinHeight" Value="44"/>
+        </Style>
+
+        <Style x:Key="TagPillStyle" TargetType="Border">
+            <Setter Property="CornerRadius" Value="7"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Background" Value="#EAF3FF"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="252"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Background="#EEF5FF" Padding="22">
-            <DockPanel>
+        <Border Grid.Column="0" Background="#F2F7FF" Padding="24,30">
+            <DockPanel LastChildFill="True">
                 <StackPanel DockPanel.Dock="Top">
-                    <StackPanel Orientation="Horizontal" Margin="0,8,0,34">
-                        <Border Width="42" Height="42" CornerRadius="10" Background="#2F7DF6" Margin="0,0,12,0">
-                            <Image Source="Assets/clipnest.png" Width="24" Height="24"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,42">
+                        <Border Width="42" Height="42" CornerRadius="11" Background="#2F7DF6" Margin="0,0,14,0">
+                            <Image Source="Assets/clipnest.png" Width="25" Height="25"/>
                         </Border>
-                        <TextBlock Text="ClipNest" FontSize="23" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Text="ClipNest" FontSize="24" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="#101828"/>
                     </StackPanel>
 
-                    <Button x:Name="HistoryButton" Content="历史" HorizontalContentAlignment="Left" Margin="0,0,0,10" Click="HistoryButton_Click"/>
-                    <Button x:Name="FavoritesButton" Content="收藏" HorizontalContentAlignment="Left" Margin="0,0,0,10" Click="FavoritesButton_Click"/>
-                    <Button Content="设置" HorizontalContentAlignment="Left" Click="SettingsButton_Click"/>
+                    <Button x:Name="HistoryButton" Style="{StaticResource SidebarNavButtonStyle}" Click="HistoryButton_Click">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="32"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE81C;" FontSize="18" VerticalAlignment="Center" Foreground="#2F7DF6"/>
+                            <TextBlock Grid.Column="1" Text="历史" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
 
-                    <Border Height="1" Background="#DDE7F5" Margin="0,28,0,20"/>
-                    <TextBlock Text="管理" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,10"/>
-                    <Button x:Name="PauseButton" Click="PauseButton_Click" HorizontalContentAlignment="Left"/>
+                    <Button x:Name="FavoritesButton" Style="{StaticResource SidebarNavButtonStyle}" Click="FavoritesButton_Click">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="32"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE734;" FontSize="18" VerticalAlignment="Center" Foreground="#667085"/>
+                            <TextBlock Grid.Column="1" Text="收藏" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarNavButtonStyle}" Click="SettingsButton_Click">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="32"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" FontSize="18" VerticalAlignment="Center" Foreground="#667085"/>
+                            <TextBlock Grid.Column="1" Text="设置" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+
+                    <Border Height="1" Background="#DFE8F5" Margin="0,28,0,22"/>
+                    <TextBlock Text="管理" Foreground="{StaticResource TextSecondaryBrush}" FontSize="14" Margin="0,0,0,12"/>
+
+                    <Button x:Name="PauseButton" Style="{StaticResource SidebarNavButtonStyle}" Click="PauseButton_Click"/>
                 </StackPanel>
 
-                <Border DockPanel.Dock="Bottom" Background="#FFFFFF" CornerRadius="10" Padding="16" BorderBrush="#E3EAF5" BorderThickness="1">
-                    <StackPanel>
-                        <TextBlock Text="剪切板历史" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="StatusText" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,6,0,10"/>
-                        <Border Height="5" Background="#E5EDF8" CornerRadius="3">
-                            <Border Width="120" Background="#2F7DF6" CornerRadius="3" HorizontalAlignment="Left"/>
-                        </Border>
-                    </StackPanel>
-                </Border>
+                <StackPanel DockPanel.Dock="Bottom">
+                    <Border Background="#FFFFFF" CornerRadius="14" Padding="18" BorderBrush="#E4ECF7" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="52"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="44" Height="44" CornerRadius="22" Background="#EAF3FF">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" Foreground="#2F7DF6" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock x:Name="SummaryTitleText" Text="记录 0 条" FontSize="15" FontWeight="SemiBold" Foreground="#1D2433"/>
+                                <TextBlock x:Name="StatusText" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,5,0,10"/>
+                                <Border Height="5" Background="#E5EDF8" CornerRadius="3">
+                                    <Border Width="118" Background="#2F7DF6" CornerRadius="3" HorizontalAlignment="Left"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Grid Margin="14,28,14,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" FontFamily="Segoe MDL2 Assets" Text="&#xE708;" Foreground="#667085" FontSize="18" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" FontFamily="Segoe MDL2 Assets" Text="&#xE897;" Foreground="#667085" FontSize="18" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" FontFamily="Segoe MDL2 Assets" Text="&#xE946;" Foreground="#667085" FontSize="18" HorizontalAlignment="Center"/>
+                    </Grid>
+                </StackPanel>
             </DockPanel>
         </Border>
 
-        <Border Grid.Column="1" Margin="28" Background="#FBFDFF" CornerRadius="16" Padding="28" BorderBrush="#E5ECF6" BorderThickness="1">
+        <Border Grid.Column="1" Margin="0" Background="#F8FBFF" CornerRadius="18,0,0,18" Padding="34,34,38,28" BorderBrush="#E6EEF9" BorderThickness="1,0,0,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <DockPanel Margin="0,0,0,22">
-                    <StackPanel DockPanel.Dock="Left">
-                        <TextBlock x:Name="PageTitle" Text="历史" FontSize="30" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="PageSubtitle" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0"/>
+                <DockPanel Margin="0,0,0,26">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                        <Border x:Name="PageIconBadge" Width="42" Height="42" CornerRadius="21" Background="#EAF3FF" Margin="0,0,14,0">
+                            <TextBlock x:Name="PageIconText" FontFamily="Segoe MDL2 Assets" Text="&#xE81C;" Foreground="#2F7DF6" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel>
+                            <TextBlock x:Name="PageTitle" Text="历史" FontSize="28" FontWeight="SemiBold" Foreground="#101828"/>
+                            <TextBlock x:Name="PageSubtitle" Foreground="{StaticResource TextSecondaryBrush}" FontSize="14" Margin="0,4,0,0"/>
+                        </StackPanel>
                     </StackPanel>
+
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                        <Button Content="清空" MinHeight="36" Padding="18,6" Margin="0,0,12,0" Click="ClearButton_Click"/>
-                        <Button Content="刷新" MinHeight="36" Padding="18,6" Background="#2F7DF6" Foreground="White" BorderBrush="#2F7DF6" Click="RefreshButton_Click"/>
+                        <Button x:Name="ClearButton" Style="{StaticResource HeaderButtonStyle}" Margin="0,0,12,0" Click="ClearButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" FontSize="15" Margin="0,0,8,0"/>
+                                <TextBlock x:Name="ClearButtonText" Text="清空"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource HeaderButtonStyle}" Background="#2F7DF6" Foreground="White" BorderBrush="#2F7DF6" Click="RefreshButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE72C;" FontSize="15" Margin="0,0,8,0"/>
+                                <TextBlock Text="刷新"/>
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </DockPanel>
 
-                <Grid Grid.Row="1" Margin="0,0,0,20">
+                <Grid Grid.Row="1" Margin="0,0,0,26">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition x:Name="CategoryColumn" Width="220"/>
+                        <ColumnDefinition x:Name="ViewModeColumn" Width="112"/>
                     </Grid.ColumnDefinitions>
-                    <TextBox x:Name="SearchBox" TextChanged="SearchBox_TextChanged" MinHeight="44" Margin="0,0,12,0"
-                             ToolTip="搜索内容、来源应用、收藏别名或分类"/>
-                    <ComboBox x:Name="CategoryFilterBox" Grid.Column="1" MinHeight="44" SelectionChanged="CategoryFilterBox_SelectionChanged"/>
+
+                    <Border Grid.Column="0" Height="46" Background="#FFFFFF" BorderBrush="#DDE7F3" BorderThickness="1" CornerRadius="10" Margin="0,0,14,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="44"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE721;" Foreground="#7C8BA1" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox x:Name="SearchBox"
+                                     Grid.Column="1"
+                                     TextChanged="SearchBox_TextChanged"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     Padding="0,7,12,7"
+                                     MinHeight="42"
+                                     VerticalContentAlignment="Center"
+                                     ToolTip="搜索剪切板内容、来源应用、收藏别名或分类"/>
+                        </Grid>
+                    </Border>
+
+                    <ComboBox x:Name="CategoryFilterBox"
+                              Grid.Column="1"
+                              Height="46"
+                              Margin="0,0,14,0"
+                              SelectionChanged="CategoryFilterBox_SelectionChanged"/>
+
+                    <StackPanel x:Name="ViewModeButtons" Grid.Column="2" Orientation="Horizontal">
+                        <Button Style="{StaticResource PrimaryIconButtonStyle}" Content="&#xECA5;" Margin="0,0,10,0" ToolTip="网格视图"/>
+                        <Button Style="{StaticResource IconButtonStyle}" Content="&#xEA37;" Width="44" Height="44" MinHeight="44" ToolTip="列表视图"/>
+                    </StackPanel>
                 </Grid>
 
                 <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -81,9 +228,16 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border x:Name="Card" Tag="{Binding}" Padding="16" Margin="0,0,18,18" Background="#FFFFFF"
-                                        BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="10"
-                                        Width="300" Height="158"
+                                <Border x:Name="Card"
+                                        Tag="{Binding}"
+                                        Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource CardWidthConverter}}"
+                                        Height="166"
+                                        Padding="18"
+                                        Margin="0,0,18,18"
+                                        Background="#FFFFFF"
+                                        BorderBrush="#E1E9F5"
+                                        BorderThickness="1"
+                                        CornerRadius="11"
                                         ToolTip="{Binding ContentText, Mode=OneWay}"
                                         RenderTransformOrigin="0.5,0.5"
                                         PreviewMouseLeftButtonDown="ItemCard_PreviewMouseLeftButtonDown"
@@ -96,48 +250,118 @@
                                     <Border.RenderTransform>
                                         <ScaleTransform ScaleX="1" ScaleY="1"/>
                                     </Border.RenderTransform>
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#9CADC7" Opacity="0.12" BlurRadius="18" ShadowDepth="4"/>
+                                    </Border.Effect>
+
                                     <Grid>
-                                        <Border Height="3" Background="#2F7DF6" CornerRadius="2" VerticalAlignment="Top" Margin="-16,-16,-16,0"/>
-                                        <Border HorizontalAlignment="Right" VerticalAlignment="Top"
-                                                Background="#2563EB" CornerRadius="7" Padding="7,2"
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Border Height="3" Background="#2F7DF6" CornerRadius="2" VerticalAlignment="Top" Margin="-18,-18,-18,0"/>
+
+                                        <Border HorizontalAlignment="Right"
+                                                VerticalAlignment="Top"
+                                                Background="#2F7DF6"
+                                                CornerRadius="0,10,0,8"
+                                                Padding="7,4"
+                                                Margin="0,-18,-18,0"
                                                 Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibilityConverter}}">
-                                            <TextBlock Text="固定" Foreground="White" FontSize="11"/>
+                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE718;" Foreground="White" FontSize="13"/>
                                         </Border>
-                                        <Grid Margin="0,8,0,0">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
-                                            <TextBlock Grid.Row="0" Text="{Binding ShortDisplayTitle, Mode=OneWay}" FontWeight="SemiBold" FontSize="15"
-                                                       TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0,0,58,0"/>
-                                            <TextBlock Grid.Row="1" Text="{Binding ShortPreview, Mode=OneWay}" Foreground="{StaticResource TextSecondaryBrush}"
-                                                       Margin="0,7,0,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Grid.Row="2" Text="{Binding FavoriteMeta, Mode=OneWay}" Foreground="#167A4A"
-                                                       Margin="0,12,0,0" FontSize="12" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Grid.Row="4" Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
-                                                       Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" TextWrapping="NoWrap"/>
-                                            <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-                                                <Button Content="固定" MinHeight="28" Padding="10,2" Tag="{Binding}" Click="PinItem_Click" Margin="0,0,8,0"
+
+                                        <Grid Grid.Row="0" Margin="0,12,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition x:Name="TypeIconColumn" Width="0"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border x:Name="TypeIcon" Width="42" Height="42" CornerRadius="10" Background="#EAF3FF" Margin="0,0,14,0" Visibility="Collapsed">
+                                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8D2;" Foreground="#2F7DF6" FontSize="19" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="{Binding ShortDisplayTitle, Mode=OneWay}"
+                                                           FontWeight="SemiBold"
+                                                           FontSize="16"
+                                                           Foreground="#101828"
+                                                           TextWrapping="NoWrap"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           Margin="0,0,24,0"/>
+                                                <TextBlock Text="{Binding ShortPreview, Mode=OneWay}"
+                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                           FontSize="13"
+                                                           Margin="0,7,0,0"
+                                                           TextWrapping="NoWrap"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <Border Grid.Row="1" Style="{StaticResource TagPillStyle}" Margin="0,14,0,0">
+                                            <TextBlock Text="{Binding FavoriteMeta, Mode=OneWay}" Foreground="#167A4A" FontSize="12" FontWeight="SemiBold" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                        </Border>
+
+                                        <Grid Grid.Row="3" VerticalAlignment="Bottom">
+                                            <TextBlock Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
+                                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                                       FontSize="13"
+                                                       TextWrapping="NoWrap"
+                                                       VerticalAlignment="Center"/>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                <Button Content="&#xE718;"
+                                                        Style="{StaticResource IconButtonStyle}"
+                                                        Tag="{Binding}"
+                                                        Click="PinItem_Click"
+                                                        Margin="0,0,8,0"
+                                                        ToolTip="固定"
                                                         Visibility="{Binding IsFavoritesView, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                                <Button Content="收藏" MinHeight="28" Padding="10,2" Tag="{Binding}" Click="FavoriteItem_Click" Margin="0,0,8,0"/>
-                                                <Button Content="删除" MinHeight="28" Padding="10,2" Tag="{Binding}" Click="DeleteItem_Click"/>
+                                                <Button Content="&#xE734;"
+                                                        Style="{StaticResource IconButtonStyle}"
+                                                        Tag="{Binding}"
+                                                        Click="FavoriteItem_Click"
+                                                        Margin="0,0,8,0"
+                                                        ToolTip="收藏"/>
+                                                <Button Content="&#xE74D;"
+                                                        Style="{StaticResource IconButtonStyle}"
+                                                        Tag="{Binding}"
+                                                        Click="DeleteItem_Click"
+                                                        ToolTip="删除"/>
                                             </StackPanel>
                                         </Grid>
                                     </Grid>
                                 </Border>
                                 <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsFavoritesView, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                                        <Setter TargetName="Card" Property="Height" Value="188"/>
+                                        <Setter TargetName="TypeIconColumn" Property="Width" Value="56"/>
+                                        <Setter TargetName="TypeIcon" Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
                                     <Trigger SourceName="Card" Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Card" Property="BorderBrush" Value="#B8C7F8"/>
-                                        <Setter TargetName="Card" Property="Background" Value="#FAFCFF"/>
+                                        <Setter TargetName="Card" Property="BorderBrush" Value="#BFD1F7"/>
+                                        <Setter TargetName="Card" Property="Background" Value="#FEFFFF"/>
                                     </Trigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
+
+                <Grid x:Name="PaginationBar" Grid.Row="3" Margin="0,10,0,0" Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Style="{StaticResource IconButtonStyle}" Content="&#xE76B;" Width="38" Height="38" MinHeight="38"/>
+                        <Border Width="38" Height="38" CornerRadius="9" Background="#2F7DF6" Margin="10,0">
+                            <TextBlock Text="1" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <Button Style="{StaticResource IconButtonStyle}" Content="&#xE76C;" Width="38" Height="38" MinHeight="38"/>
+                    </StackPanel>
+                    <ComboBox Width="118" Height="38" HorizontalAlignment="Right" SelectedIndex="0">
+                        <ComboBoxItem Content="12 条/页"/>
+                        <ComboBoxItem Content="24 条/页"/>
+                        <ComboBoxItem Content="48 条/页"/>
+                    </ComboBox>
+                </Grid>
             </Grid>
         </Border>
     </Grid>

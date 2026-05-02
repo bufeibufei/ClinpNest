@@ -56,6 +56,7 @@ public partial class MainWindow
 
         ItemsList.ItemsSource = _items;
         SearchBox.Text = string.Empty;
+        SetPageMode(favoritesOnly: false);
         UpdateStatus();
 
         SourceInitialized += MainWindow_SourceInitialized;
@@ -114,6 +115,7 @@ public partial class MainWindow
         }
 
         PageSubtitle.Text = $"{_items.Count} 条记录 · 快捷键 {_hotkeyService.Current.DisplayText}";
+        SummaryTitleText.Text = _favoritesOnly ? $"收藏 {_items.Count} 条" : $"记录 {_items.Count} 条";
     }
 
     private async Task LoadCategoriesAsync()
@@ -140,8 +142,35 @@ public partial class MainWindow
     private void UpdateStatus()
     {
         PauseButton.Content = _historyService.IsPaused ? "恢复记录" : "暂停记录";
-        StatusText.Text = _historyService.IsPaused ? "当前已暂停记录。" : "后台正在记录文本剪切板。";
+        StatusText.Text = _historyService.IsPaused ? "当前已暂停记录。" : (_favoritesOnly ? "总剪切板历史" : "剪切板历史");
         _trayService.BuildMenu(() => _historyService.IsPaused);
+    }
+
+    private void SetPageMode(bool favoritesOnly)
+    {
+        _favoritesOnly = favoritesOnly;
+        IsFavoritesView = favoritesOnly;
+        PageTitle.Text = favoritesOnly ? "收藏" : "历史";
+        PageIconText.Text = favoritesOnly ? "\uE734" : "\uE81C";
+        ClearButtonText.Text = favoritesOnly ? "清空收藏" : "清空";
+        StatusText.Text = _historyService.IsPaused ? "当前已暂停记录。" : (favoritesOnly ? "总剪切板历史" : "剪切板历史");
+
+        CategoryColumn.Width = favoritesOnly ? new GridLength(220) : new GridLength(0);
+        ViewModeColumn.Width = favoritesOnly ? new GridLength(112) : new GridLength(0);
+        CategoryFilterBox.Visibility = favoritesOnly ? Visibility.Visible : Visibility.Collapsed;
+        ViewModeButtons.Visibility = favoritesOnly ? Visibility.Visible : Visibility.Collapsed;
+        PaginationBar.Visibility = favoritesOnly ? Visibility.Visible : Visibility.Collapsed;
+
+        var selectedBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(231, 240, 255));
+        var transparent = new SolidColorBrush(System.Windows.Media.Colors.Transparent);
+        HistoryButton.Background = favoritesOnly ? transparent : selectedBackground;
+        FavoritesButton.Background = favoritesOnly ? selectedBackground : transparent;
+        PageIconBadge.Background = favoritesOnly
+            ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 244, 218))
+            : new SolidColorBrush(System.Windows.Media.Color.FromRgb(234, 243, 255));
+        PageIconText.Foreground = favoritesOnly
+            ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(245, 158, 11))
+            : new SolidColorBrush(System.Windows.Media.Color.FromRgb(47, 125, 246));
     }
 
     private void TryRegisterHotkey(HotkeySettings settings, bool showMessage)
@@ -200,7 +229,16 @@ public partial class MainWindow
 
     private async Task ClearAsync()
     {
-        await _clipboardRepository.ClearAsync();
+        if (_favoritesOnly)
+        {
+            await _clipboardRepository.ClearFavoritesAsync();
+            await LoadCategoriesAsync();
+        }
+        else
+        {
+            await _clipboardRepository.ClearAsync();
+        }
+
         await RefreshAsync();
     }
 
@@ -235,17 +273,13 @@ public partial class MainWindow
 
     private async void HistoryButton_Click(object sender, RoutedEventArgs e)
     {
-        _favoritesOnly = false;
-        IsFavoritesView = false;
-        PageTitle.Text = "历史";
+        SetPageMode(favoritesOnly: false);
         await RefreshAsync();
     }
 
     private async void FavoritesButton_Click(object sender, RoutedEventArgs e)
     {
-        _favoritesOnly = true;
-        IsFavoritesView = true;
-        PageTitle.Text = "收藏";
+        SetPageMode(favoritesOnly: true);
         await RefreshAsync();
     }
 

@@ -208,6 +208,23 @@ public sealed class ClipboardRepository(AppDatabase database)
         await command.ExecuteNonQueryAsync();
     }
 
+    public async Task ClearFavoritesAsync()
+    {
+        await using var connection = database.OpenConnection();
+        var command = connection.CreateCommand();
+        command.CommandText = """
+            UPDATE clipboard_items
+            SET is_favorite = 0,
+                is_pinned = 0,
+                favorite_order = 0,
+                favorite_alias = '',
+                favorite_tag = '',
+                favorited_at = NULL
+            WHERE is_favorite = 1
+            """;
+        await command.ExecuteNonQueryAsync();
+    }
+
     private static ClipboardItem ReadItem(SqliteDataReader reader)
     {
         return new ClipboardItem

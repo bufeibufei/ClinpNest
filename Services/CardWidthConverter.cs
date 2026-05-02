@@ -14,14 +14,14 @@ public sealed class CardWidthConverter : IValueConverter
 
         var columns = width switch
         {
-            < 620 => 1,
-            < 980 => 2,
-            < 1320 => 3,
+            < 540 => 1,
+            < 860 => 2,
+            < 1180 => 3,
             _ => 4
         };
 
-        const double gap = 12;
-        return Math.Max(260, Math.Floor((width - gap * (columns - 1)) / columns));
+        const double gap = 18;
+        return Math.Max(250, Math.Floor((width - gap * (columns - 1)) / columns));
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
