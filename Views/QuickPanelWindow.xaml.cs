@@ -2,6 +2,8 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using ClipNest.Data;
 using ClipNest.Models;
 using ClipNest.Services;
@@ -141,7 +143,40 @@ public partial class QuickPanelWindow
 
     private async void ItemCard_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        if (IsActionElement(e.OriginalSource as DependencyObject))
+        {
+            return;
+        }
+
         await PasteAsync((sender as FrameworkElement)?.Tag as ClipboardItem);
+    }
+
+    private async void FavoriteItem_Click(object sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
+        if ((sender as System.Windows.Controls.Button)?.Tag is not ClipboardItem item)
+        {
+            return;
+        }
+
+        var tags = await _clipboardRepository.GetFavoriteTagsAsync();
+        var dialog = new FavoriteDialog(item, tags) { Owner = this };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        if (dialog.RemoveFavorite)
+        {
+            await _clipboardRepository.UnfavoriteAsync(item.Id);
+        }
+        else
+        {
+            await _clipboardRepository.SetFavoriteAsync(item.Id, dialog.Alias, dialog.FavoriteTag);
+        }
+
+        await LoadCategoriesAsync(resetSelection: false);
+        await RefreshAsync();
     }
 
     private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -150,5 +185,20 @@ public partial class QuickPanelWindow
         {
             Hide();
         }
+    }
+
+    private static bool IsActionElement(DependencyObject? source)
+    {
+        while (source is not null)
+        {
+            if (source is System.Windows.Controls.Button)
+            {
+                return true;
+            }
+
+            source = source is Visual or Visual3D ? VisualTreeHelper.GetParent(source) : LogicalTreeHelper.GetParent(source);
+        }
+
+        return false;
     }
 }

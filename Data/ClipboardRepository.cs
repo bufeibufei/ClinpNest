@@ -212,7 +212,7 @@ public sealed class ClipboardRepository(AppDatabase database)
     {
         await using var connection = database.OpenConnection();
         var command = connection.CreateCommand();
-        command.CommandText = "UPDATE clipboard_items SET is_deleted = 1";
+        command.CommandText = "UPDATE clipboard_items SET is_deleted = 1 WHERE is_favorite = 0";
         await command.ExecuteNonQueryAsync();
     }
 

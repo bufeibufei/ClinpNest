@@ -40,15 +40,15 @@
                 <TextBlock Grid.Row="1" Text="输入一个新的分类名称，保存后可在收藏条目时直接选择。" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,22"/>
                 <StackPanel Grid.Row="2">
                     <TextBlock Text="分类名称" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <Border Background="#FFFFFF" BorderBrush="#B9C9E5" BorderThickness="1" CornerRadius="9" Height="48">
-                        <TextBox x:Name="TagNameBox"
-                                 BorderThickness="0"
-                                 Background="Transparent"
-                                 Foreground="#202124"
-                                 FontSize="15"
-                                 Padding="14,8"
-                                 VerticalContentAlignment="Center"/>
-                    </Border>
+                    <TextBox x:Name="TagNameBox"
+                             Height="48"
+                             Background="#FFFFFF"
+                             BorderBrush="#B9C9E5"
+                             BorderThickness="1"
+                             Foreground="#202124"
+                             FontSize="15"
+                             Padding="14,8"
+                             VerticalContentAlignment="Center"/>
                 </StackPanel>
             </Grid>
 

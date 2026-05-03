@@ -100,8 +100,7 @@
                                     <Grid Grid.Row="4">
                                         <TextBlock Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                            <Button Style="{StaticResource QuickIconButtonStyle}" Content="&#xE734;" Foreground="#F59E0B" Margin="0,0,8,0"/>
-                                            <Button Style="{StaticResource QuickIconButtonStyle}" Content="&#xE8A5;"/>
+                                            <Button Style="{StaticResource QuickIconButtonStyle}" Content="&#xE734;" Foreground="#F59E0B" Tag="{Binding}" Click="FavoriteItem_Click"/>
                                         </StackPanel>
                                     </Grid>
                                 </Grid>
@@ -139,8 +138,7 @@
                                     <Grid Grid.Row="3">
                                         <TextBlock Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                            <Button Style="{StaticResource QuickIconButtonStyle}" Content="&#xE734;" Margin="0,0,8,0"/>
-                                            <Button Style="{StaticResource QuickIconButtonStyle}" Content="&#xE8A5;"/>
+                                            <Button Style="{StaticResource QuickIconButtonStyle}" Content="&#xE734;" Tag="{Binding}" Click="FavoriteItem_Click"/>
                                         </StackPanel>
                                     </Grid>
                                 </Grid>
