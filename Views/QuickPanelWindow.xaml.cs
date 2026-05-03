@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using System.Windows.Threading;
 using ClipNest.Data;
 using ClipNest.Models;
 using ClipNest.Services;
@@ -18,21 +19,35 @@ public partial class QuickPanelWindow
     public static readonly DependencyProperty HistoryCardWidthProperty =
         DependencyProperty.Register(nameof(HistoryCardWidth), typeof(double), typeof(QuickPanelWindow), new PropertyMetadata(220d));
 
+    public static readonly DependencyProperty SearchQueryProperty =
+        DependencyProperty.Register(nameof(SearchQuery), typeof(string), typeof(QuickPanelWindow), new PropertyMetadata(string.Empty));
+
+    public static readonly DependencyProperty SelectedItemIdProperty =
+        DependencyProperty.Register(nameof(SelectedItemId), typeof(long), typeof(QuickPanelWindow), new PropertyMetadata(0L));
+
     private readonly ClipboardRepository _clipboardRepository;
     private readonly PasteService _pasteService;
     private readonly ObservableCollection<ClipboardItem> _favorites = [];
     private readonly ObservableCollection<ClipboardItem> _history = [];
+    private readonly DispatcherTimer _searchDebounceTimer;
     private bool _forceClose;
     private int _favoriteColumns;
     private int _historyColumns;
     private double _lastFavoriteCardWidth;
     private double _lastHistoryCardWidth;
+    private int _selectedIndex;
 
     public QuickPanelWindow(ClipboardRepository clipboardRepository, PasteService pasteService)
     {
         InitializeComponent();
         _clipboardRepository = clipboardRepository;
         _pasteService = pasteService;
+        _searchDebounceTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+        _searchDebounceTimer.Tick += async (_, _) =>
+        {
+            _searchDebounceTimer.Stop();
+            await RefreshAsync();
+        };
         FavoritesList.ItemsSource = _favorites;
         HistoryList.ItemsSource = _history;
         Closing += QuickPanelWindow_Closing;
@@ -50,6 +65,18 @@ public partial class QuickPanelWindow
         set => SetValue(HistoryCardWidthProperty, value);
     }
 
+    public string SearchQuery
+    {
+        get => (string)GetValue(SearchQueryProperty);
+        set => SetValue(SearchQueryProperty, value);
+    }
+
+    public long SelectedItemId
+    {
+        get => (long)GetValue(SelectedItemIdProperty);
+        set => SetValue(SelectedItemIdProperty, value);
+    }
+
     public async void ShowPanel()
     {
         if (IsVisible)
@@ -60,6 +87,7 @@ public partial class QuickPanelWindow
 
         await LoadCategoriesAsync(resetSelection: true);
         SearchBox.Text = string.Empty;
+        SearchQuery = string.Empty;
         await RefreshAsync();
 
         Left = SystemParameters.WorkArea.Left + (SystemParameters.WorkArea.Width - Width) / 2;
@@ -130,10 +158,52 @@ public partial class QuickPanelWindow
         {
             _history.Add(item);
         }
+
+        NormalizeSelection();
     }
 
-    private ClipboardItem? FirstItem()
-        => _favorites.FirstOrDefault() ?? _history.FirstOrDefault();
+    private IReadOnlyList<ClipboardItem> CombinedItems()
+        => _favorites.Concat(_history).ToList();
+
+    private ClipboardItem? SelectedItem()
+    {
+        var items = CombinedItems();
+        return items.FirstOrDefault(item => item.Id == SelectedItemId) ?? items.FirstOrDefault();
+    }
+
+    private void NormalizeSelection()
+    {
+        var items = CombinedItems();
+        if (items.Count == 0)
+        {
+            _selectedIndex = 0;
+            SelectedItemId = 0;
+            return;
+        }
+
+        var currentIndex = items.ToList().FindIndex(item => item.Id == SelectedItemId);
+        if (currentIndex < 0)
+        {
+            _selectedIndex = 0;
+            SelectedItemId = items[0].Id;
+            return;
+        }
+
+        _selectedIndex = currentIndex;
+    }
+
+    private void MoveSelection(int delta)
+    {
+        var items = CombinedItems();
+        if (items.Count == 0)
+        {
+            SelectedItemId = 0;
+            return;
+        }
+
+        _selectedIndex = Math.Clamp(_selectedIndex + delta, 0, items.Count - 1);
+        SelectedItemId = items[_selectedIndex].Id;
+    }
 
     private async Task PasteAsync(ClipboardItem? item)
     {
@@ -146,7 +216,12 @@ public partial class QuickPanelWindow
         await _pasteService.PasteAsync(item);
     }
 
-    private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => await RefreshAsync();
+    private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        SearchQuery = SearchBox.Text;
+        _searchDebounceTimer.Stop();
+        _searchDebounceTimer.Start();
+    }
 
     private async void CategoryFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => await RefreshAsync();
 
@@ -201,7 +276,17 @@ public partial class QuickPanelWindow
     {
         if (e.Key == Key.Enter)
         {
-            await PasteAsync(FirstItem());
+            await PasteAsync(SelectedItem());
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Down)
+        {
+            MoveSelection(1);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Up)
+        {
+            MoveSelection(-1);
             e.Handled = true;
         }
         else if (e.Key == Key.Escape)

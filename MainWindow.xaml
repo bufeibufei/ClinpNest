@@ -1,6 +1,7 @@
 <Window x:Class="ClipNest.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:ClipNest.Controls"
         Title="ClipNest"
         Height="760"
         Width="1280"
@@ -270,24 +271,32 @@
                                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8D2;" Foreground="#2F7DF6" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </Border>
                                             <StackPanel Grid.Column="1">
-                                                <TextBlock Text="{Binding ShortDisplayTitle, Mode=OneWay}"
-                                                           FontWeight="SemiBold"
-                                                           FontSize="15"
-                                                           Foreground="#101828"
-                                                           TextWrapping="NoWrap"
-                                                           TextTrimming="CharacterEllipsis"
-                                                           Margin="0,0,24,0"/>
-                                                <TextBlock Text="{Binding ShortPreview, Mode=OneWay}"
-                                                           Foreground="{StaticResource TextSecondaryBrush}"
-                                                           FontSize="13"
-                                                           Margin="0,4,0,0"
-                                                           TextWrapping="NoWrap"
-                                                           TextTrimming="CharacterEllipsis"/>
+                                                <controls:HighlightedTextBlock RawText="{Binding ShortDisplayTitle, Mode=OneWay}"
+                                                                               Query="{Binding SearchQuery, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                               FontWeight="SemiBold"
+                                                                               FontSize="15"
+                                                                               Foreground="#101828"
+                                                                               TextWrapping="NoWrap"
+                                                                               TextTrimming="CharacterEllipsis"
+                                                                               Margin="0,0,24,0"/>
+                                                <controls:HighlightedTextBlock RawText="{Binding ShortPreview, Mode=OneWay}"
+                                                                               Query="{Binding SearchQuery, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                                                               FontSize="13"
+                                                                               Margin="0,4,0,0"
+                                                                               TextWrapping="NoWrap"
+                                                                               TextTrimming="CharacterEllipsis"/>
                                             </StackPanel>
                                         </Grid>
 
                                         <Border Grid.Row="1" Style="{StaticResource TagPillStyle}" Margin="0,7,0,0">
-                                            <TextBlock Text="{Binding FavoriteMeta, Mode=OneWay}" Foreground="#167A4A" FontSize="12" FontWeight="SemiBold" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                            <controls:HighlightedTextBlock RawText="{Binding FavoriteMeta, Mode=OneWay}"
+                                                                           Query="{Binding SearchQuery, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                           Foreground="#167A4A"
+                                                                           FontSize="12"
+                                                                           FontWeight="SemiBold"
+                                                                           TextWrapping="NoWrap"
+                                                                           TextTrimming="CharacterEllipsis"/>
                                         </Border>
 
                                         <Grid Grid.Row="3" VerticalAlignment="Bottom">

@@ -125,6 +125,72 @@ public sealed class ClipboardRepository(AppDatabase database)
         await command.ExecuteNonQueryAsync();
     }
 
+    public async Task RenameFavoriteTagAsync(string oldName, string newName)
+    {
+        oldName = oldName.Trim();
+        newName = newName.Trim();
+        if (string.IsNullOrWhiteSpace(oldName) || string.IsNullOrWhiteSpace(newName) ||
+            string.Equals(oldName, newName, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        await using var connection = database.OpenConnection();
+        await using var transaction = await connection.BeginTransactionAsync();
+
+        var insert = connection.CreateCommand();
+        insert.Transaction = (SqliteTransaction)transaction;
+        insert.CommandText = """
+            INSERT INTO favorite_tags(name, created_at)
+            VALUES($name, $created_at)
+            ON CONFLICT(name) DO NOTHING
+            """;
+        insert.Parameters.AddWithValue("$name", newName);
+        insert.Parameters.AddWithValue("$created_at", DateTime.UtcNow.ToString("O"));
+        await insert.ExecuteNonQueryAsync();
+
+        var updateItems = connection.CreateCommand();
+        updateItems.Transaction = (SqliteTransaction)transaction;
+        updateItems.CommandText = "UPDATE clipboard_items SET favorite_tag = $new_name WHERE favorite_tag = $old_name";
+        updateItems.Parameters.AddWithValue("$old_name", oldName);
+        updateItems.Parameters.AddWithValue("$new_name", newName);
+        await updateItems.ExecuteNonQueryAsync();
+
+        var deleteOld = connection.CreateCommand();
+        deleteOld.Transaction = (SqliteTransaction)transaction;
+        deleteOld.CommandText = "DELETE FROM favorite_tags WHERE name = $old_name";
+        deleteOld.Parameters.AddWithValue("$old_name", oldName);
+        await deleteOld.ExecuteNonQueryAsync();
+
+        await transaction.CommitAsync();
+    }
+
+    public async Task DeleteFavoriteTagAsync(string tag)
+    {
+        tag = tag.Trim();
+        if (string.IsNullOrWhiteSpace(tag))
+        {
+            return;
+        }
+
+        await using var connection = database.OpenConnection();
+        await using var transaction = await connection.BeginTransactionAsync();
+
+        var clearItems = connection.CreateCommand();
+        clearItems.Transaction = (SqliteTransaction)transaction;
+        clearItems.CommandText = "UPDATE clipboard_items SET favorite_tag = '' WHERE favorite_tag = $tag";
+        clearItems.Parameters.AddWithValue("$tag", tag);
+        await clearItems.ExecuteNonQueryAsync();
+
+        var deleteTag = connection.CreateCommand();
+        deleteTag.Transaction = (SqliteTransaction)transaction;
+        deleteTag.CommandText = "DELETE FROM favorite_tags WHERE name = $tag";
+        deleteTag.Parameters.AddWithValue("$tag", tag);
+        await deleteTag.ExecuteNonQueryAsync();
+
+        await transaction.CommitAsync();
+    }
+
     public async Task MarkUsedAsync(long id)
     {
         await using var connection = database.OpenConnection();

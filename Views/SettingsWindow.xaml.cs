@@ -1,18 +1,25 @@
+using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using ClipNest.Data;
 using ClipNest.Models;
 
 namespace ClipNest.Views;
 
 public partial class SettingsWindow
 {
+    private readonly ClipboardRepository _clipboardRepository;
+    private readonly ObservableCollection<string> _categories = [];
     private HotkeySettings _current;
     private bool _syncingLimit;
+    private bool _syncingCategory;
 
-    public SettingsWindow(HotkeySettings current, int historyLimit)
+    public SettingsWindow(HotkeySettings current, int historyLimit, ClipboardRepository clipboardRepository)
     {
         _syncingLimit = true;
         InitializeComponent();
+        _clipboardRepository = clipboardRepository;
         _current = current;
         SelectedHotkey = current;
         HistoryLimit = ClampHistoryLimit(historyLimit);
@@ -20,12 +27,33 @@ public partial class SettingsWindow
         HistoryLimitSlider.Value = HistoryLimit;
         HistoryLimitBox.Text = HistoryLimit.ToString();
         HintText.Text = "建议保留至少两个修饰键，避免和系统快捷键冲突。";
+        CategoryList.ItemsSource = _categories;
+        Loaded += async (_, _) => await LoadCategoriesAsync();
         _syncingLimit = false;
     }
 
     public HotkeySettings? SelectedHotkey { get; private set; }
 
     public int HistoryLimit { get; private set; }
+
+    public bool CategoriesChanged { get; private set; }
+
+    private async Task LoadCategoriesAsync(string? selected = null)
+    {
+        var previous = selected ?? CategoryList.SelectedItem as string;
+        _syncingCategory = true;
+        _categories.Clear();
+        foreach (var tag in await _clipboardRepository.GetFavoriteTagsAsync())
+        {
+            _categories.Add(tag);
+        }
+
+        CategoryList.SelectedItem = !string.IsNullOrWhiteSpace(previous) && _categories.Contains(previous)
+            ? previous
+            : null;
+        CategoryNameBox.Text = CategoryList.SelectedItem as string ?? string.Empty;
+        _syncingCategory = false;
+    }
 
     private void HotkeyBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
@@ -66,7 +94,7 @@ public partial class SettingsWindow
         SetHistoryLimit((int)e.NewValue);
     }
 
-    private void HistoryLimitBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    private void HistoryLimitBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (_syncingLimit || !int.TryParse(HistoryLimitBox.Text, out var value))
         {
@@ -91,6 +119,49 @@ public partial class SettingsWindow
     }
 
     private static int ClampHistoryLimit(int value) => Math.Clamp(value, 20, 500);
+
+    private void CategoryList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_syncingCategory)
+        {
+            return;
+        }
+
+        CategoryNameBox.Text = CategoryList.SelectedItem as string ?? string.Empty;
+    }
+
+    private async void SaveCategoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        var newName = CategoryNameBox.Text.Trim();
+        if (string.IsNullOrWhiteSpace(newName))
+        {
+            return;
+        }
+
+        if (CategoryList.SelectedItem is string oldName && !string.Equals(oldName, newName, StringComparison.OrdinalIgnoreCase))
+        {
+            await _clipboardRepository.RenameFavoriteTagAsync(oldName, newName);
+        }
+        else
+        {
+            await _clipboardRepository.AddFavoriteTagAsync(newName);
+        }
+
+        CategoriesChanged = true;
+        await LoadCategoriesAsync(newName);
+    }
+
+    private async void DeleteCategoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (CategoryList.SelectedItem is not string tag)
+        {
+            return;
+        }
+
+        await _clipboardRepository.DeleteFavoriteTagAsync(tag);
+        CategoriesChanged = true;
+        await LoadCategoriesAsync();
+    }
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {

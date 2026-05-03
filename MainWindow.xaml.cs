@@ -6,6 +6,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Media3D;
+using System.Windows.Threading;
 using ClipNest.Data;
 using ClipNest.Models;
 using ClipNest.Services;
@@ -21,6 +22,9 @@ public partial class MainWindow
     public static readonly DependencyProperty CardWidthProperty =
         DependencyProperty.Register(nameof(CardWidth), typeof(double), typeof(MainWindow), new PropertyMetadata(260d));
 
+    public static readonly DependencyProperty SearchQueryProperty =
+        DependencyProperty.Register(nameof(SearchQuery), typeof(string), typeof(MainWindow), new PropertyMetadata(string.Empty));
+
     private readonly ClipboardRepository _clipboardRepository;
     private readonly SettingsRepository _settingsRepository;
     private readonly ClipboardHistoryService _historyService;
@@ -29,6 +33,7 @@ public partial class MainWindow
     private readonly PasteService _pasteService;
     private readonly TrayService _trayService;
     private readonly ObservableCollection<ClipboardItem> _items = [];
+    private readonly DispatcherTimer _searchDebounceTimer;
     private HotkeySettings _hotkeySettings;
     private QuickPanelWindow? _quickPanel;
     private ClipboardItem? _draggedItem;
@@ -60,9 +65,16 @@ public partial class MainWindow
         _trayService = trayService;
         _hotkeySettings = hotkeySettings;
         _historyLimit = _historyService.HistoryLimit;
+        _searchDebounceTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+        _searchDebounceTimer.Tick += async (_, _) =>
+        {
+            _searchDebounceTimer.Stop();
+            await RefreshAsync();
+        };
 
         ItemsList.ItemsSource = _items;
         SearchBox.Text = string.Empty;
+        SearchQuery = string.Empty;
         SetPageMode(favoritesOnly: false);
         UpdateStatus();
 
@@ -89,6 +101,12 @@ public partial class MainWindow
     {
         get => (double)GetValue(CardWidthProperty);
         set => SetValue(CardWidthProperty, value);
+    }
+
+    public string SearchQuery
+    {
+        get => (string)GetValue(SearchQueryProperty);
+        set => SetValue(SearchQueryProperty, value);
     }
 
     private async void MainWindow_SourceInitialized(object? sender, EventArgs e)
@@ -265,12 +283,19 @@ public partial class MainWindow
 
     private void OpenSettings()
     {
-        var window = new SettingsWindow(_hotkeySettings, _historyLimit)
+        var window = new SettingsWindow(_hotkeySettings, _historyLimit, _clipboardRepository)
         {
             Owner = this
         };
 
-        if (window.ShowDialog() != true || window.SelectedHotkey is null)
+        var saved = window.ShowDialog() == true;
+        if (window.CategoriesChanged)
+        {
+            _ = LoadCategoriesAsync();
+            _ = RefreshAsync();
+        }
+
+        if (!saved || window.SelectedHotkey is null)
         {
             return;
         }
@@ -316,7 +341,12 @@ public partial class MainWindow
         await RefreshAsync();
     }
 
-    private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => await RefreshAsync();
+    private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        SearchQuery = SearchBox.Text;
+        _searchDebounceTimer.Stop();
+        _searchDebounceTimer.Start();
+    }
 
     private async void CategoryFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => await RefreshAsync();
 

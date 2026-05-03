@@ -45,11 +45,15 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="收藏条目" FontSize="30" FontWeight="SemiBold" Foreground="#101828"/>
-                <TextBlock Grid.Row="1" Text="设置别名，并从下拉框选择分类。" Foreground="{StaticResource TextSecondaryBrush}" FontSize="15" Margin="0,10,0,28"/>
+                <TextBlock Grid.Row="1"
+                           Text="设置别名，并从下拉框选择分类。"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="15"
+                           Margin="0,10,0,28"/>
 
                 <StackPanel Grid.Row="2">
                     <TextBlock Text="别名" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
-                    <TextBox x:Name="AliasBox" Height="56" FontSize="16" Padding="18,10" BorderBrush="#B9C9E5"/>
+                    <TextBox x:Name="AliasBox" Height="52" FontSize="16" Padding="18,0" BorderBrush="#B9C9E5" VerticalContentAlignment="Center"/>
 
                     <TextBlock Text="分类" FontSize="18" FontWeight="SemiBold" Margin="0,28,0,10"/>
                     <Grid>

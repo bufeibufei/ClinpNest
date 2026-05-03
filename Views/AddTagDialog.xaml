@@ -19,14 +19,12 @@
             </Grid.RowDefinitions>
 
             <Border Grid.Row="0" BorderBrush="#DDE7F3" BorderThickness="0,0,0,1" Padding="26,0">
-                <DockPanel>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Border Width="28" Height="28" CornerRadius="7" Background="#2F7DF6" Margin="0,0,12,0">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" Foreground="White" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <TextBlock Text="添加分类" FontSize="18" FontWeight="SemiBold" Foreground="#101828" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </DockPanel>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="28" Height="28" CornerRadius="7" Background="#2F7DF6" Margin="0,0,12,0">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" Foreground="White" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="添加分类" FontSize="18" FontWeight="SemiBold" Foreground="#101828" VerticalAlignment="Center"/>
+                </StackPanel>
             </Border>
 
             <Grid Grid.Row="1" Margin="30,22,30,18">
@@ -37,11 +35,13 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="添加分类" FontSize="26" FontWeight="SemiBold" Foreground="#101828"/>
-                <TextBlock Grid.Row="1" Text="输入一个新的分类名称，保存后可在收藏条目时直接选择。" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,22"/>
+                <TextBlock Grid.Row="1" Text="输入新的分类名称，保存后可在收藏条目时直接选择。"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="0,8,0,22"/>
                 <StackPanel Grid.Row="2">
                     <TextBlock Text="分类名称" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8"/>
                     <TextBox x:Name="TagNameBox"
-                             Height="56"
+                             Height="48"
                              Background="#FFFFFF"
                              BorderBrush="#B9C9E5"
                              BorderThickness="1"

@@ -10,6 +10,14 @@ public sealed class ClipboardHistoryService(
     SensitiveContentService sensitiveContent,
     SourceAppService sourceApp)
 {
+    private static readonly TimeSpan[] ClipboardRetryDelays =
+    [
+        TimeSpan.Zero,
+        TimeSpan.FromMilliseconds(35),
+        TimeSpan.FromMilliseconds(90),
+        TimeSpan.FromMilliseconds(160)
+    ];
+
     private string? _lastHash;
 
     public event EventHandler? Changed;
@@ -25,17 +33,8 @@ public sealed class ClipboardHistoryService(
             return;
         }
 
-        string text;
-        try
-        {
-            if (!System.Windows.Clipboard.ContainsText())
-            {
-                return;
-            }
-
-            text = System.Windows.Clipboard.GetText();
-        }
-        catch
+        var text = await TryReadClipboardTextAsync();
+        if (string.IsNullOrEmpty(text))
         {
             return;
         }
@@ -70,5 +69,36 @@ public sealed class ClipboardHistoryService(
     {
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(text));
         return Convert.ToHexString(bytes);
+    }
+
+    private static async Task<string?> TryReadClipboardTextAsync()
+    {
+        Exception? lastError = null;
+        for (var attempt = 0; attempt < ClipboardRetryDelays.Length; attempt++)
+        {
+            var delay = ClipboardRetryDelays[attempt];
+            if (delay > TimeSpan.Zero)
+            {
+                await Task.Delay(delay);
+            }
+
+            try
+            {
+                return System.Windows.Clipboard.ContainsText()
+                    ? System.Windows.Clipboard.GetText()
+                    : null;
+            }
+            catch (Exception ex)
+            {
+                lastError = ex;
+            }
+        }
+
+        if (lastError is not null)
+        {
+            AppLogger.Error(lastError, "读取剪切板文本失败，已完成短暂重试。");
+        }
+
+        return null;
     }
 }
