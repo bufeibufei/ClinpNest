@@ -12,11 +12,21 @@ namespace ClipNest.Views;
 
 public partial class QuickPanelWindow
 {
+    public static readonly DependencyProperty FavoriteCardWidthProperty =
+        DependencyProperty.Register(nameof(FavoriteCardWidth), typeof(double), typeof(QuickPanelWindow), new PropertyMetadata(220d));
+
+    public static readonly DependencyProperty HistoryCardWidthProperty =
+        DependencyProperty.Register(nameof(HistoryCardWidth), typeof(double), typeof(QuickPanelWindow), new PropertyMetadata(220d));
+
     private readonly ClipboardRepository _clipboardRepository;
     private readonly PasteService _pasteService;
     private readonly ObservableCollection<ClipboardItem> _favorites = [];
     private readonly ObservableCollection<ClipboardItem> _history = [];
     private bool _forceClose;
+    private int _favoriteColumns;
+    private int _historyColumns;
+    private double _lastFavoriteCardWidth;
+    private double _lastHistoryCardWidth;
 
     public QuickPanelWindow(ClipboardRepository clipboardRepository, PasteService pasteService)
     {
@@ -26,6 +36,18 @@ public partial class QuickPanelWindow
         FavoritesList.ItemsSource = _favorites;
         HistoryList.ItemsSource = _history;
         Closing += QuickPanelWindow_Closing;
+    }
+
+    public double FavoriteCardWidth
+    {
+        get => (double)GetValue(FavoriteCardWidthProperty);
+        set => SetValue(FavoriteCardWidthProperty, value);
+    }
+
+    public double HistoryCardWidth
+    {
+        get => (double)GetValue(HistoryCardWidthProperty);
+        set => SetValue(HistoryCardWidthProperty, value);
     }
 
     public async void ShowPanel()
@@ -46,6 +68,7 @@ public partial class QuickPanelWindow
         Show();
         Activate();
         SearchBox.Focus();
+        UpdateQuickCardWidths();
     }
 
     public void ForceClose()
@@ -126,6 +149,53 @@ public partial class QuickPanelWindow
     private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => await RefreshAsync();
 
     private async void CategoryFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => await RefreshAsync();
+
+    private void QuickList_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateQuickCardWidths();
+
+    private void UpdateQuickCardWidths()
+    {
+        UpdateCardWidth(FavoritesList, isFavoriteList: true);
+        UpdateCardWidth(HistoryList, isFavoriteList: false);
+    }
+
+    private void UpdateCardWidth(FrameworkElement list, bool isFavoriteList)
+    {
+        var availableWidth = list.ActualWidth;
+        if (availableWidth <= 0)
+        {
+            return;
+        }
+
+        const double gap = 12;
+        const double minCardWidth = 210;
+        const int maxColumns = 7;
+        var bucketedWidth = Math.Floor(Math.Max(0, availableWidth - 4) / 8) * 8;
+        var columns = Math.Clamp((int)Math.Floor((bucketedWidth + gap) / (minCardWidth + gap)), 1, maxColumns);
+        var cardWidth = Math.Max(minCardWidth, Math.Floor((bucketedWidth - gap * columns) / columns));
+
+        if (isFavoriteList)
+        {
+            if (columns == _favoriteColumns && Math.Abs(cardWidth - _lastFavoriteCardWidth) < 1)
+            {
+                return;
+            }
+
+            _favoriteColumns = columns;
+            _lastFavoriteCardWidth = cardWidth;
+            FavoriteCardWidth = cardWidth;
+        }
+        else
+        {
+            if (columns == _historyColumns && Math.Abs(cardWidth - _lastHistoryCardWidth) < 1)
+            {
+                return;
+            }
+
+            _historyColumns = columns;
+            _lastHistoryCardWidth = cardWidth;
+            HistoryCardWidth = cardWidth;
+        }
+    }
 
     private async void SearchBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {

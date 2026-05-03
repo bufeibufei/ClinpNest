@@ -202,17 +202,12 @@ public partial class MainWindow
         }
 
         const double gap = 12;
-        const double targetCardWidth = 224;
-        const double minCardWidth = 198;
-        const int maxColumns = 7;
+        const double minCardWidth = 205;
+        const int maxColumns = 8;
 
         var measuredWidth = Math.Max(0, availableWidth - 4);
         var bucketedWidth = Math.Floor(measuredWidth / 8) * 8;
-        var columns = Math.Clamp((int)Math.Floor((bucketedWidth + gap) / (targetCardWidth + gap)), 1, maxColumns);
-        while (columns > 1 && (bucketedWidth - gap * columns) / columns < minCardWidth)
-        {
-            columns--;
-        }
+        var columns = Math.Clamp((int)Math.Floor((bucketedWidth + gap) / (minCardWidth + gap)), 1, maxColumns);
 
         var cardWidth = Math.Max(minCardWidth, Math.Floor((bucketedWidth - gap * columns) / columns));
         if (columns == _gridColumns && Math.Abs(cardWidth - _lastCardWidth) < 1)

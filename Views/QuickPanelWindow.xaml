@@ -65,8 +65,8 @@
             </Grid>
 
             <TextBlock Grid.Row="1" Text="收藏" FontSize="16" FontWeight="SemiBold" Foreground="#101828" Margin="2,22,0,12"/>
-            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl x:Name="FavoritesList">
+            <ScrollViewer Grid.Row="2" Padding="0,0,2,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl x:Name="FavoritesList" SizeChanged="QuickList_SizeChanged">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel IsItemsHost="True"/>
@@ -74,7 +74,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Tag="{Binding}" Width="230" Height="146" Padding="16" Margin="0,0,12,12"
+                            <Border Tag="{Binding}" Width="{Binding FavoriteCardWidth, RelativeSource={RelativeSource AncestorType=Window}}" Height="146" Padding="16" Margin="0,0,12,12"
                                     Background="#FFFFFF" BorderBrush="#DFE7F2" BorderThickness="1" CornerRadius="9"
                                     ToolTip="{Binding ContentText, Mode=OneWay}"
                                     MouseLeftButtonUp="ItemCard_MouseLeftButtonUp">
@@ -98,8 +98,12 @@
                                         <TextBlock Text="{Binding FavoriteMeta, Mode=OneWay}" Foreground="#087C66" FontSize="12" FontWeight="SemiBold" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
                                     </Border>
                                     <Grid Grid.Row="4">
-                                        <TextBlock Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                                             <Button Style="{StaticResource QuickIconButtonStyle}" Content="&#xE734;" Foreground="#F59E0B" Tag="{Binding}" Click="FavoriteItem_Click"/>
                                         </StackPanel>
                                     </Grid>
@@ -111,8 +115,8 @@
             </ScrollViewer>
 
             <TextBlock Grid.Row="3" Text="历史" FontSize="16" FontWeight="SemiBold" Foreground="#101828" Margin="2,18,0,12"/>
-            <ScrollViewer Grid.Row="4" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl x:Name="HistoryList">
+            <ScrollViewer Grid.Row="4" Padding="0,0,2,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl x:Name="HistoryList" SizeChanged="QuickList_SizeChanged">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel IsItemsHost="True"/>
@@ -120,7 +124,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Tag="{Binding}" Width="230" Height="112" Padding="16" Margin="0,0,12,12"
+                            <Border Tag="{Binding}" Width="{Binding HistoryCardWidth, RelativeSource={RelativeSource AncestorType=Window}}" Height="112" Padding="16" Margin="0,0,12,12"
                                     Background="#FFFFFF" BorderBrush="#DFE7F2" BorderThickness="1" CornerRadius="9"
                                     ToolTip="{Binding ContentText, Mode=OneWay}"
                                     MouseLeftButtonUp="ItemCard_MouseLeftButtonUp">
@@ -136,8 +140,12 @@
                                     <TextBlock Grid.Row="1" Text="{Binding SourceApp, Mode=OneWay}" Foreground="{StaticResource TextSecondaryBrush}"
                                                Margin="0,8,0,0" FontSize="12" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
                                     <Grid Grid.Row="3">
-                                        <TextBlock Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                                             <Button Style="{StaticResource QuickIconButtonStyle}" Content="&#xE734;" Tag="{Binding}" Click="FavoriteItem_Click"/>
                                         </StackPanel>
                                     </Grid>
