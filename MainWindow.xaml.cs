@@ -168,7 +168,8 @@ public partial class MainWindow
         IsFavoritesView = favoritesOnly;
         PageTitle.Text = favoritesOnly ? "收藏" : "历史";
         PageIconText.Text = favoritesOnly ? "\uE734" : "\uE81C";
-        ClearButtonText.Text = favoritesOnly ? "清空收藏" : "清空";
+        ClearButtonText.Text = "清空";
+        ClearButton.Visibility = favoritesOnly ? Visibility.Collapsed : Visibility.Visible;
         StatusText.Text = _historyService.IsPaused ? "当前已暂停记录。" : (favoritesOnly ? "总剪切板历史" : "剪切板历史");
 
         CategoryColumn.Width = favoritesOnly ? new GridLength(190) : new GridLength(0);
@@ -318,8 +319,6 @@ public partial class MainWindow
     private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => await RefreshAsync();
 
     private async void CategoryFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => await RefreshAsync();
-
-    private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
 
     private async void ClearButton_Click(object sender, RoutedEventArgs e) => await ClearAsync();
 

@@ -42,16 +42,12 @@
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#F4F7FF"/>
-                            </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Trigger.EnterActions>
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <DoubleAnimation Storyboard.TargetName="ButtonScale" Storyboard.TargetProperty="ScaleX" To="0.96" Duration="0:0:0.06"/>
                                             <DoubleAnimation Storyboard.TargetName="ButtonScale" Storyboard.TargetProperty="ScaleY" To="0.96" Duration="0:0:0.06"/>
-                                            <ColorAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" To="#E9F0FF" Duration="0:0:0.06"/>
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </Trigger.EnterActions>
