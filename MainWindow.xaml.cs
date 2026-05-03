@@ -38,6 +38,7 @@ public partial class MainWindow
     private bool _isExiting;
     private int _historyLimit = 100;
     private int _gridColumns;
+    private double _lastCardWidth;
 
     public MainWindow(
         ClipboardRepository clipboardRepository,
@@ -201,24 +202,27 @@ public partial class MainWindow
         }
 
         const double gap = 12;
-        const double idealCardWidth = 224;
-        const double minCardWidth = 206;
-        var maxColumns = Math.Clamp((int)Math.Floor((availableWidth + gap) / (minCardWidth + gap)), 1, 5);
-        var idealColumns = Math.Clamp((int)Math.Round((availableWidth + gap) / (idealCardWidth + gap)), 1, 5);
-        var columns = Math.Min(maxColumns, idealColumns);
+        const double targetCardWidth = 224;
+        const double minCardWidth = 198;
+        const int maxColumns = 7;
 
-        if (_gridColumns > 0 && Math.Abs(columns - _gridColumns) == 1)
+        var measuredWidth = Math.Max(0, availableWidth - 4);
+        var bucketedWidth = Math.Floor(measuredWidth / 8) * 8;
+        var columns = Math.Clamp((int)Math.Floor((bucketedWidth + gap) / (targetCardWidth + gap)), 1, maxColumns);
+        while (columns > 1 && (bucketedWidth - gap * columns) / columns < minCardWidth)
         {
-            var currentWidth = (availableWidth - gap * (_gridColumns - 1)) / _gridColumns;
-            var proposedWidth = (availableWidth - gap * (columns - 1)) / columns;
-            if (currentWidth is >= 206 and <= 264 && proposedWidth is >= 206 and <= 264)
-            {
-                columns = _gridColumns;
-            }
+            columns--;
+        }
+
+        var cardWidth = Math.Max(minCardWidth, Math.Floor((bucketedWidth - gap * columns) / columns));
+        if (columns == _gridColumns && Math.Abs(cardWidth - _lastCardWidth) < 1)
+        {
+            return;
         }
 
         _gridColumns = columns;
-        CardWidth = Math.Floor((availableWidth - gap * (columns - 1)) / columns);
+        _lastCardWidth = cardWidth;
+        CardWidth = cardWidth;
     }
 
     private void TryRegisterHotkey(HotkeySettings settings, bool showMessage)
