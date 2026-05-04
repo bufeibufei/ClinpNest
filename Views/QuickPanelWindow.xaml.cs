@@ -282,7 +282,7 @@ public partial class QuickPanelWindow
 
         const double gap = 12;
         const double minCardWidth = 210;
-        const int maxColumns = 7;
+        const int maxColumns = 2;
         var bucketedWidth = Math.Floor(Math.Max(0, availableWidth - 4) / 8) * 8;
         var columns = Math.Clamp((int)Math.Floor((bucketedWidth + gap) / (minCardWidth + gap)), 1, maxColumns);
         var cardWidth = Math.Max(minCardWidth, Math.Floor((bucketedWidth - gap * columns) / columns));
