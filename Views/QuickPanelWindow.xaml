@@ -4,8 +4,8 @@
         xmlns:controls="clr-namespace:ClipNest.Controls"
         xmlns:services="clr-namespace:ClipNest.Services"
         Title="ClipNest 搜索"
-        Width="1260" Height="700"
-        MinWidth="900" MinHeight="540"
+        Width="1260" Height="780"
+        MinWidth="900" MinHeight="640"
         WindowStyle="SingleBorderWindow"
         ResizeMode="CanResizeWithGrip"
         Topmost="True"
@@ -33,9 +33,9 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="2*"/>
+                <RowDefinition Height="*" MinHeight="248"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="3*"/>
+                <RowDefinition Height="*" MinHeight="248"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
