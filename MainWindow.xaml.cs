@@ -283,7 +283,7 @@ public partial class MainWindow
 
     private void OpenSettings()
     {
-        var window = new SettingsWindow(_hotkeySettings, _historyLimit, _clipboardRepository)
+        var window = new SettingsWindow(_hotkeySettings, _historyLimit, _clipboardRepository, StartupService.IsEnabled())
         {
             Owner = this
         };
@@ -303,8 +303,10 @@ public partial class MainWindow
         TryRegisterHotkey(window.SelectedHotkey, showMessage: false);
         _historyLimit = window.HistoryLimit;
         _historyService.HistoryLimit = _historyLimit;
+        StartupService.SetEnabled(window.StartWithWindows);
         _ = _settingsRepository.SetAsync("quick_panel_hotkey", window.SelectedHotkey.ToString());
         _ = _settingsRepository.SetAsync("history_limit", _historyLimit.ToString());
+        _ = _settingsRepository.SetAsync("start_with_windows", window.StartWithWindows ? "true" : "false");
         _ = _clipboardRepository.TrimHistoryAsync(_historyLimit);
         _ = RefreshAsync();
     }

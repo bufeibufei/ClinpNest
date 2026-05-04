@@ -15,7 +15,7 @@ public partial class SettingsWindow
     private bool _syncingLimit;
     private bool _syncingCategory;
 
-    public SettingsWindow(HotkeySettings current, int historyLimit, ClipboardRepository clipboardRepository)
+    public SettingsWindow(HotkeySettings current, int historyLimit, ClipboardRepository clipboardRepository, bool startWithWindows)
     {
         _syncingLimit = true;
         InitializeComponent();
@@ -26,6 +26,7 @@ public partial class SettingsWindow
         HotkeyBox.Text = current.DisplayText;
         HistoryLimitSlider.Value = HistoryLimit;
         HistoryLimitBox.Text = HistoryLimit.ToString();
+        StartupCheckBox.IsChecked = startWithWindows;
         HintText.Text = "建议保留至少两个修饰键，避免和系统快捷键冲突。";
         CategoryList.ItemsSource = _categories;
         Loaded += async (_, _) => await LoadCategoriesAsync();
@@ -37,6 +38,8 @@ public partial class SettingsWindow
     public int HistoryLimit { get; private set; }
 
     public bool CategoriesChanged { get; private set; }
+
+    public bool StartWithWindows => StartupCheckBox.IsChecked == true;
 
     private async Task LoadCategoriesAsync(string? selected = null)
     {

@@ -1,4 +1,4 @@
-using ClipNest.Data;
+﻿using ClipNest.Data;
 using ClipNest.Models;
 using ClipNest.Services;
 using System.Windows;

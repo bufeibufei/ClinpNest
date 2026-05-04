@@ -54,6 +54,12 @@
                                Foreground="{StaticResource TextSecondaryBrush}"
                                Margin="0,8,0,26"/>
 
+                    <TextBlock Text="启动" FontSize="17" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <CheckBox x:Name="StartupCheckBox"
+                              Content="开机后自动启动 ClipNest"
+                              MinHeight="34"
+                              Margin="0,0,0,24"/>
+
                     <TextBlock Text="收藏分类" FontSize="17" FontWeight="SemiBold" Margin="0,0,0,10"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
