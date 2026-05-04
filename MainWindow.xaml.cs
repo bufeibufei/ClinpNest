@@ -32,6 +32,7 @@ public partial class MainWindow
     private readonly HotkeyService _hotkeyService;
     private readonly PasteService _pasteService;
     private readonly TrayService _trayService;
+    private readonly UsageStatsService _usageStatsService;
     private readonly ObservableCollection<ClipboardItem> _items = [];
     private readonly DispatcherTimer _searchDebounceTimer;
     private HotkeySettings _hotkeySettings;
@@ -53,7 +54,8 @@ public partial class MainWindow
         HotkeyService hotkeyService,
         PasteService pasteService,
         TrayService trayService,
-        HotkeySettings hotkeySettings)
+        HotkeySettings hotkeySettings,
+        UsageStatsService usageStatsService)
     {
         InitializeComponent();
         _clipboardRepository = clipboardRepository;
@@ -63,6 +65,7 @@ public partial class MainWindow
         _hotkeyService = hotkeyService;
         _pasteService = pasteService;
         _trayService = trayService;
+        _usageStatsService = usageStatsService;
         _hotkeySettings = hotkeySettings;
         _historyLimit = _historyService.HistoryLimit;
         _searchDebounceTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
@@ -81,6 +84,7 @@ public partial class MainWindow
         SourceInitialized += MainWindow_SourceInitialized;
         Closing += MainWindow_Closing;
         _historyService.Changed += async (_, _) => await Dispatcher.InvokeAsync(RefreshAsync);
+        _usageStatsService.Changed += async (_, _) => await Dispatcher.InvokeAsync(UpdateUsageStatsAsync);
         _hotkeyService.Pressed += (_, _) => Dispatcher.Invoke(ShowQuickPanel);
 
         _trayService.OpenRequested += (_, _) => Dispatcher.Invoke(ShowMainWindow);
@@ -117,6 +121,7 @@ public partial class MainWindow
         TryRegisterHotkey(_hotkeySettings, showMessage: true);
         await LoadCategoriesAsync();
         await RefreshAsync();
+        await UpdateUsageStatsAsync();
     }
 
     private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
@@ -178,6 +183,13 @@ public partial class MainWindow
         PauseButton.Content = _historyService.IsPaused ? "恢复记录" : "暂停记录";
         StatusText.Text = _historyService.IsPaused ? "当前已暂停记录。" : (_favoritesOnly ? "总剪切板历史" : "剪切板历史");
         _trayService.BuildMenu(() => _historyService.IsPaused);
+    }
+
+    private async Task UpdateUsageStatsAsync()
+    {
+        var (copyCount, pasteCount) = await _usageStatsService.GetAsync();
+        CopyCountText.Text = $"{copyCount} 次";
+        PasteCountText.Text = $"{pasteCount} 次";
     }
 
     private void SetPageMode(bool favoritesOnly)
@@ -357,6 +369,12 @@ public partial class MainWindow
     private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e) => OpenSettings();
+
+    private async void ResetStatsButton_Click(object sender, RoutedEventArgs e)
+    {
+        await _usageStatsService.ResetAsync();
+        await UpdateUsageStatsAsync();
+    }
 
     private void ItemsList_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateCardWidth();
 

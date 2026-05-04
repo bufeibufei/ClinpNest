@@ -40,13 +40,15 @@ public partial class App
 
             var clipboardRepository = new ClipboardRepository(database);
             var settingsRepository = new SettingsRepository(database);
+            var usageStatsService = new UsageStatsService(settingsRepository);
             var historyService = new ClipboardHistoryService(
                 clipboardRepository,
                 new SensitiveContentService(),
-                new SourceAppService());
+                new SourceAppService(),
+                usageStatsService);
             var monitorService = new ClipboardMonitorService(historyService);
             var hotkeyService = new HotkeyService();
-            var pasteService = new PasteService(clipboardRepository, historyService);
+            var pasteService = new PasteService(clipboardRepository, historyService, usageStatsService);
 
             var savedHotkey = HotkeySettings.Parse(await settingsRepository.GetAsync("quick_panel_hotkey"));
             var historyLimit = ParseHistoryLimit(await settingsRepository.GetAsync("history_limit"));
@@ -61,7 +63,8 @@ public partial class App
                 hotkeyService,
                 pasteService,
                 _trayService,
-                savedHotkey);
+                savedHotkey,
+                usageStatsService);
 
             _mainWindow.Show();
             AppLogger.Info("Startup finished");

@@ -130,6 +130,53 @@
                         </Grid>
                     </Border>
 
+                    <Border Background="#FFFFFF" CornerRadius="12" Padding="14" BorderBrush="#E4ECF7" BorderThickness="1" Margin="0,12,0,0">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="44"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Width="36" Height="36" CornerRadius="18" Background="#F1F6FF">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8C8;" Foreground="#667085" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="复制次数" FontSize="14" FontWeight="SemiBold" Foreground="#1D2433"/>
+                                    <TextBlock x:Name="CopyCountText" Text="0 次" Foreground="#1D2433" FontSize="14" FontWeight="SemiBold" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Border Height="1" Background="#EEF2F7" Margin="0,0,0,12"/>
+
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="44"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Width="36" Height="36" CornerRadius="18" Background="#F1F6FF">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE77F;" Foreground="#667085" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="粘贴次数" FontSize="14" FontWeight="SemiBold" Foreground="#1D2433"/>
+                                    <TextBlock x:Name="PasteCountText" Text="0 次" Foreground="#1D2433" FontSize="14" FontWeight="SemiBold" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Button x:Name="ResetStatsButton"
+                                    Height="38"
+                                    Background="#2F7DF6"
+                                    BorderBrush="#2F7DF6"
+                                    Foreground="White"
+                                    FontWeight="SemiBold"
+                                    Click="ResetStatsButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE72C;" FontSize="15" Margin="0,0,8,0"/>
+                                    <TextBlock Text="重置统计"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
                     <Grid Margin="10,22,10,0" Visibility="Collapsed">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>

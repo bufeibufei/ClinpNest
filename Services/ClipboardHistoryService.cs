@@ -8,7 +8,8 @@ namespace ClipNest.Services;
 public sealed class ClipboardHistoryService(
     ClipboardRepository repository,
     SensitiveContentService sensitiveContent,
-    SourceAppService sourceApp)
+    SourceAppService sourceApp,
+    UsageStatsService usageStats)
 {
     private static readonly TimeSpan[] ClipboardRetryDelays =
     [
@@ -66,6 +67,7 @@ public sealed class ClipboardHistoryService(
             UpdatedAt = now
         });
         await repository.TrimHistoryAsync(HistoryLimit);
+        await usageStats.IncrementCopyAsync();
 
         Changed?.Invoke(this, EventArgs.Empty);
     }

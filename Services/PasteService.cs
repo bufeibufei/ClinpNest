@@ -5,7 +5,7 @@ using ClipNest.Models;
 
 namespace ClipNest.Services;
 
-public sealed class PasteService(ClipboardRepository repository, ClipboardHistoryService historyService)
+public sealed class PasteService(ClipboardRepository repository, ClipboardHistoryService historyService, UsageStatsService usageStats)
 {
     public async Task PasteAsync(ClipboardItem item)
     {
@@ -21,6 +21,7 @@ public sealed class PasteService(ClipboardRepository repository, ClipboardHistor
         try
         {
             SendKeys.SendWait("^v");
+            await usageStats.IncrementPasteAsync();
         }
         catch (Exception ex)
         {
