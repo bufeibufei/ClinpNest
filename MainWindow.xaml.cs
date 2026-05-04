@@ -476,7 +476,15 @@ public partial class MainWindow
     {
         if ((sender as System.Windows.Controls.Button)?.Tag is ClipboardItem item)
         {
-            await _clipboardRepository.SoftDeleteAsync(item.Id);
+            if (_favoritesOnly)
+            {
+                await _clipboardRepository.UnfavoriteAsync(item.Id);
+            }
+            else
+            {
+                await _clipboardRepository.SoftDeleteAsync(item.Id);
+            }
+
             await RefreshAsync();
         }
     }

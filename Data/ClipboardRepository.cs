@@ -32,16 +32,19 @@ public sealed class ClipboardRepository(AppDatabase database)
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task<IReadOnlyList<ClipboardItem>> SearchAsync(string query, int limit = 80, bool favoritesOnly = false)
+    public async Task<IReadOnlyList<ClipboardItem>> SearchAsync(
+        string query,
+        int limit = 80,
+        bool favoritesOnly = false,
+        bool includeDeletedFavorites = false)
     {
         await using var connection = database.OpenConnection();
         var command = connection.CreateCommand();
-        var filters = "is_deleted = 0";
-        if (favoritesOnly)
-        {
-            filters += " AND is_favorite = 1";
-        }
-
+        var filters = favoritesOnly
+            ? "is_favorite = 1"
+            : includeDeletedFavorites
+                ? "(is_deleted = 0 OR is_favorite = 1)"
+                : "is_deleted = 0";
         if (!string.IsNullOrWhiteSpace(query))
         {
             filters += " AND (content_text LIKE $query OR source_app LIKE $query OR favorite_alias LIKE $query OR favorite_tag LIKE $query)";
@@ -88,7 +91,7 @@ public sealed class ClipboardRepository(AppDatabase database)
     {
         await using var connection = database.OpenConnection();
         var command = connection.CreateCommand();
-        command.CommandText = "SELECT COUNT(*) FROM clipboard_items WHERE is_deleted = 0 AND is_favorite = 1";
+        command.CommandText = "SELECT COUNT(*) FROM clipboard_items WHERE is_favorite = 1";
         return Convert.ToInt32(await command.ExecuteScalarAsync());
     }
 

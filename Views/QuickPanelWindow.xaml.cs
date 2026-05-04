@@ -143,7 +143,7 @@ public partial class QuickPanelWindow
 
     private async Task RefreshAsync()
     {
-        var results = await _clipboardRepository.SearchAsync(SearchBox.Text, 128);
+        var results = await _clipboardRepository.SearchAsync(SearchBox.Text, 128, includeDeletedFavorites: true);
         var selectedCategory = SelectedCategory();
         if (!string.IsNullOrWhiteSpace(selectedCategory))
         {
