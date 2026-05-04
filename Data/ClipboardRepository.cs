@@ -84,6 +84,14 @@ public sealed class ClipboardRepository(AppDatabase database)
         return Convert.ToInt32(await command.ExecuteScalarAsync());
     }
 
+    public async Task<int> CountFavoritesAsync()
+    {
+        await using var connection = database.OpenConnection();
+        var command = connection.CreateCommand();
+        command.CommandText = "SELECT COUNT(*) FROM clipboard_items WHERE is_deleted = 0 AND is_favorite = 1";
+        return Convert.ToInt32(await command.ExecuteScalarAsync());
+    }
+
     public async Task<IReadOnlyList<string>> GetFavoriteTagsAsync()
     {
         await using var connection = database.OpenConnection();

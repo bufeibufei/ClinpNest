@@ -153,10 +153,22 @@ public partial class MainWindow
         }
 
         var historyCount = await _clipboardRepository.CountActiveAsync();
+        var favoriteCount = await _clipboardRepository.CountFavoritesAsync();
         PageSubtitle.Text = $"{_items.Count} 条记录 · 快捷键 {_hotkeyService.Current.DisplayText}";
         SummaryTitleText.Text = $"{historyCount} / {_historyLimit}";
         HistoryUsageBar.Maximum = Math.Max(1, _historyLimit);
         HistoryUsageBar.Value = Math.Min(historyCount, _historyLimit);
+        if (_favoritesOnly)
+        {
+            SummaryTitleText.Text = favoriteCount.ToString();
+            StatusText.Text = "收藏数";
+            HistoryUsageBar.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            StatusText.Text = _historyService.IsPaused ? "当前已暂停记录。" : "剪切板历史";
+            HistoryUsageBar.Visibility = Visibility.Visible;
+        }
     }
 
     private IEnumerable<ClipboardItem> SortItems(IEnumerable<ClipboardItem> items)
@@ -203,7 +215,9 @@ public partial class MainWindow
     private void UpdateStatus()
     {
         PauseButton.Content = _historyService.IsPaused ? "恢复记录" : "暂停记录";
-        StatusText.Text = _historyService.IsPaused ? "当前已暂停记录。" : (_favoritesOnly ? "总剪切板历史" : "剪切板历史");
+        StatusText.Text = _favoritesOnly
+            ? "收藏数"
+            : (_historyService.IsPaused ? "当前已暂停记录。" : "剪切板历史");
         _trayService.BuildMenu(() => _historyService.IsPaused);
     }
 
@@ -222,7 +236,10 @@ public partial class MainWindow
         PageIconText.Text = favoritesOnly ? "\uE734" : "\uE81C";
         ClearButtonText.Text = "清空";
         ClearButton.Visibility = favoritesOnly ? Visibility.Collapsed : Visibility.Visible;
-        StatusText.Text = _historyService.IsPaused ? "当前已暂停记录。" : (favoritesOnly ? "总剪切板历史" : "剪切板历史");
+        HistoryUsageBar.Visibility = favoritesOnly ? Visibility.Collapsed : Visibility.Visible;
+        StatusText.Text = favoritesOnly
+            ? "收藏数"
+            : (_historyService.IsPaused ? "当前已暂停记录。" : "剪切板历史");
 
         CategoryColumn.Width = favoritesOnly ? new GridLength(190) : new GridLength(0);
         CategoryFilterBox.Visibility = favoritesOnly ? Visibility.Visible : Visibility.Collapsed;
