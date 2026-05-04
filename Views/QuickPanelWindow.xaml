@@ -155,8 +155,10 @@
                                     </Grid.RowDefinitions>
                                     <controls:HighlightedTextBlock Grid.Row="0" RawText="{Binding ShortPreview, Mode=OneWay}" Query="{Binding SearchQuery, RelativeSource={RelativeSource AncestorType=Window}}" FontWeight="SemiBold"
                                                                    Foreground="#101828" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                                    <controls:HighlightedTextBlock Grid.Row="1" RawText="{Binding SourceApp, Mode=OneWay}" Query="{Binding SearchQuery, RelativeSource={RelativeSource AncestorType=Window}}" Foreground="{StaticResource TextSecondaryBrush}"
-                                                                   Margin="0,8,0,0" FontSize="12" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                    <Border Grid.Row="1" Background="#DDF3EE" CornerRadius="7" Padding="8,3" HorizontalAlignment="Left" Margin="0,10,0,0">
+                                        <controls:HighlightedTextBlock RawText="{Binding SourceApp, Mode=OneWay}" Query="{Binding SearchQuery, RelativeSource={RelativeSource AncestorType=Window}}" Foreground="#087C66"
+                                                                       FontSize="12" FontWeight="SemiBold" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                    </Border>
                                     <Grid Grid.Row="3">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
