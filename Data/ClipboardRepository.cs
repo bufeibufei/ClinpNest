@@ -214,7 +214,7 @@ public sealed class ClipboardRepository(AppDatabase database)
             SET is_favorite = 1,
                 favorite_alias = $alias,
                 favorite_tag = $tag,
-                favorited_at = COALESCE(favorited_at, $now)
+                favorited_at = $now
             WHERE id = $id
             """;
         command.Parameters.AddWithValue("$id", id);

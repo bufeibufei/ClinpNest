@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 using ClipNest.Data;
@@ -300,10 +301,26 @@ public partial class QuickPanelWindow
     {
         if (IsActionElement(e.OriginalSource as DependencyObject))
         {
+            if (sender is Border card)
+            {
+                AnimateCard(card, 1, 1);
+            }
             return;
         }
 
+        if (sender is Border itemCard)
+        {
+            AnimateCard(itemCard, 1, 1);
+        }
         await PasteAsync((sender as FrameworkElement)?.Tag as ClipboardItem);
+    }
+
+    private void ItemCard_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (!IsActionElement(e.OriginalSource as DependencyObject) && sender is Border card)
+        {
+            AnimateCard(card, 0.985, 1);
+        }
     }
 
     private async void FavoriteItem_Click(object sender, RoutedEventArgs e)
@@ -355,5 +372,20 @@ public partial class QuickPanelWindow
         }
 
         return false;
+    }
+
+    private static void AnimateCard(Border card, double scale, double opacity)
+    {
+        if (card.RenderTransform is not ScaleTransform transform || transform.IsFrozen)
+        {
+            transform = new ScaleTransform(1, 1);
+            card.RenderTransform = transform;
+            card.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
+        }
+
+        var duration = TimeSpan.FromMilliseconds(120);
+        transform.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(scale, duration));
+        transform.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(scale, duration));
+        card.BeginAnimation(OpacityProperty, new DoubleAnimation(opacity, duration));
     }
 }

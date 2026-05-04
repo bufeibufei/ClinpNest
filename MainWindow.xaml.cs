@@ -422,6 +422,10 @@ public partial class MainWindow
         _dragStartPoint = e.GetPosition(null);
         _draggedItem = (sender as FrameworkElement)?.Tag as ClipboardItem;
         _isDragging = false;
+        if (!IsActionElement(e.OriginalSource as DependencyObject) && sender is Border card)
+        {
+            AnimateCard(card, 0.985, 1);
+        }
     }
 
     private void ItemCard_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
@@ -452,11 +456,19 @@ public partial class MainWindow
         if (_isDragging || IsActionElement(e.OriginalSource as DependencyObject))
         {
             _isDragging = false;
+            if (sender is Border card)
+            {
+                AnimateCard(card, 1, 1);
+            }
             return;
         }
 
         if ((sender as FrameworkElement)?.Tag is ClipboardItem item)
         {
+            if (sender is Border card)
+            {
+                AnimateCard(card, 1, 1);
+            }
             await PasteItemAsync(item);
         }
     }

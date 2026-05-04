@@ -5,10 +5,11 @@ using ClipNest.Models;
 
 namespace ClipNest.Services;
 
-public sealed class PasteService(ClipboardRepository repository)
+public sealed class PasteService(ClipboardRepository repository, ClipboardHistoryService historyService)
 {
     public async Task PasteAsync(ClipboardItem item)
     {
+        historyService.IgnoreNextText(item.ContentText);
         var copied = await TrySetClipboardTextAsync(item.ContentText);
         if (!copied)
         {

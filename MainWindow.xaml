@@ -304,7 +304,8 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
+                                            <TextBlock x:Name="ItemTimeText"
+                                                       Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
                                                        Foreground="{StaticResource TextSecondaryBrush}"
                                                        FontSize="13"
                                                        TextWrapping="NoWrap"
@@ -340,6 +341,7 @@
                                         <Setter TargetName="Card" Property="Height" Value="146"/>
                                         <Setter TargetName="TypeIconColumn" Property="Width" Value="44"/>
                                         <Setter TargetName="TypeIcon" Property="Visibility" Value="Visible"/>
+                                        <Setter TargetName="ItemTimeText" Property="Text" Value="{Binding FavoriteDisplayTime, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsFavorite}" Value="True">
                                         <Setter TargetName="FavoriteButton" Property="Foreground" Value="#F59E0B"/>

@@ -23,4 +23,5 @@ public sealed class ClipboardItem
     public string DisplayTitle => string.IsNullOrWhiteSpace(FavoriteAlias) ? Preview : FavoriteAlias;
     public string ShortDisplayTitle => DisplayTitle.Length <= 42 ? DisplayTitle : DisplayTitle[..42] + "...";
     public string FavoriteMeta => string.IsNullOrWhiteSpace(FavoriteTag) ? SourceApp : $"{FavoriteTag} · {SourceApp}";
+    public DateTime FavoriteDisplayTime => FavoritedAt ?? UpdatedAt;
 }

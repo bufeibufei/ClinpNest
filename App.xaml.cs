@@ -46,7 +46,7 @@ public partial class App
                 new SourceAppService());
             var monitorService = new ClipboardMonitorService(historyService);
             var hotkeyService = new HotkeyService();
-            var pasteService = new PasteService(clipboardRepository);
+            var pasteService = new PasteService(clipboardRepository, historyService);
 
             var savedHotkey = HotkeySettings.Parse(await settingsRepository.GetAsync("quick_panel_hotkey"));
             var historyLimit = ParseHistoryLimit(await settingsRepository.GetAsync("history_limit"));

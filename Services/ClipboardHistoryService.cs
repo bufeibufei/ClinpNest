@@ -26,6 +26,11 @@ public sealed class ClipboardHistoryService(
 
     public int HistoryLimit { get; set; } = 100;
 
+    public void IgnoreNextText(string text)
+    {
+        _lastHash = Hash(text);
+    }
+
     public async Task CaptureCurrentTextAsync()
     {
         if (IsPaused)

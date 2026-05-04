@@ -81,6 +81,7 @@
                             <Border x:Name="FavoriteCard" Tag="{Binding}" Width="{Binding FavoriteCardWidth, RelativeSource={RelativeSource AncestorType=Window}}" Height="146" Padding="16" Margin="0,0,12,12"
                                     Background="#FFFFFF" BorderBrush="#DFE7F2" BorderThickness="1" CornerRadius="9"
                                     ToolTip="{Binding ContentText, Mode=OneWay}"
+                                    PreviewMouseLeftButtonDown="ItemCard_PreviewMouseLeftButtonDown"
                                     MouseLeftButtonUp="ItemCard_MouseLeftButtonUp">
                                 <Border.Effect>
                                     <DropShadowEffect Color="#9CADC7" Opacity="0.12" BlurRadius="16" ShadowDepth="3"/>
@@ -106,7 +107,7 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"/>
+                                        <TextBlock Text="{Binding FavoriteDisplayTime, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"/>
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                                             <Button Style="{StaticResource QuickIconButtonStyle}" Content="&#xE734;" Foreground="#F59E0B" Tag="{Binding}" Click="FavoriteItem_Click"/>
                                         </StackPanel>
@@ -143,6 +144,7 @@
                             <Border x:Name="HistoryCard" Tag="{Binding}" Width="{Binding HistoryCardWidth, RelativeSource={RelativeSource AncestorType=Window}}" Height="112" Padding="16" Margin="0,0,12,12"
                                     Background="#FFFFFF" BorderBrush="#DFE7F2" BorderThickness="1" CornerRadius="9"
                                     ToolTip="{Binding ContentText, Mode=OneWay}"
+                                    PreviewMouseLeftButtonDown="ItemCard_PreviewMouseLeftButtonDown"
                                     MouseLeftButtonUp="ItemCard_MouseLeftButtonUp">
                                 <Grid>
                                     <Grid.RowDefinitions>
