@@ -266,7 +266,7 @@
                                 <Border x:Name="Card"
                                         Tag="{Binding}"
                                         Width="{Binding CardWidth, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        Height="132"
+                                        Height="140"
                                         Padding="14"
                                         Margin="0,0,12,12"
                                         Background="#FFFFFF"
@@ -346,7 +346,7 @@
                                                                            TextTrimming="CharacterEllipsis"/>
                                         </Border>
 
-                                        <Grid Grid.Row="3" VerticalAlignment="Bottom" Margin="0,0,0,1">
+                                        <Grid Grid.Row="3" VerticalAlignment="Bottom" Margin="0,0,0,5">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
@@ -355,11 +355,13 @@
                                                        Text="{Binding UpdatedAt, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
                                                        Foreground="{StaticResource TextSecondaryBrush}"
                                                        FontSize="13"
-                                                       TextWrapping="NoWrap"
-                                                       TextTrimming="CharacterEllipsis"
-                                                       Margin="0,0,10,0"
-                                                       VerticalAlignment="Center"/>
-                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                                       TextWrapping="Wrap"
+                                                       TextTrimming="None"
+                                                       LineHeight="16"
+                                                       MaxHeight="34"
+                                                       Margin="0,0,12,0"
+                                                       VerticalAlignment="Bottom"/>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,1">
                                                 <Button x:Name="PinButton"
                                                         Content="&#xE718;"
                                                         Style="{StaticResource IconButtonStyle}"
@@ -386,7 +388,7 @@
                                 </Border>
                                 <DataTemplate.Triggers>
                                     <DataTrigger Binding="{Binding IsFavoritesView, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                                        <Setter TargetName="Card" Property="Height" Value="146"/>
+                                        <Setter TargetName="Card" Property="Height" Value="154"/>
                                         <Setter TargetName="TypeIconColumn" Property="Width" Value="44"/>
                                         <Setter TargetName="TypeIcon" Property="Visibility" Value="Visible"/>
                                         <Setter TargetName="ItemTimeText" Property="Text" Value="{Binding FavoriteDisplayTime, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"/>
