@@ -1,5 +1,5 @@
 #define MyAppName "ClipNest"
-#define MyAppVersion "3.1.0"
+#define MyAppVersion "4.0.0"
 #define MyAppPublisher "ClipNest"
 #define MyAppExeName "ClipNest.exe"
 #define SourceDir "..\artifacts\publish\win-x64"
