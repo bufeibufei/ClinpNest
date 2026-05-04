@@ -89,6 +89,7 @@ public partial class QuickPanelWindow
         await LoadCategoriesAsync(resetSelection: true);
         SearchBox.Text = string.Empty;
         SearchQuery = string.Empty;
+        ResetSelection();
         await RefreshAsync();
 
         Left = SystemParameters.WorkArea.Left + (SystemParameters.WorkArea.Width - Width) / 2;
@@ -160,7 +161,7 @@ public partial class QuickPanelWindow
             _history.Add(item);
         }
 
-        NormalizeSelection();
+        NormalizeSelection(preferFirstItem: false);
     }
 
     private IReadOnlyList<ClipboardItem> CombinedItems()
@@ -172,7 +173,13 @@ public partial class QuickPanelWindow
         return items.FirstOrDefault(item => item.Id == SelectedItemId) ?? items.FirstOrDefault();
     }
 
-    private void NormalizeSelection()
+    private void ResetSelection()
+    {
+        _selectedIndex = 0;
+        SelectedItemId = 0;
+    }
+
+    private void NormalizeSelection(bool preferFirstItem)
     {
         var items = CombinedItems();
         if (items.Count == 0)
@@ -182,7 +189,7 @@ public partial class QuickPanelWindow
             return;
         }
 
-        var currentIndex = items.ToList().FindIndex(item => item.Id == SelectedItemId);
+        var currentIndex = preferFirstItem ? -1 : items.ToList().FindIndex(item => item.Id == SelectedItemId);
         if (currentIndex < 0)
         {
             _selectedIndex = 0;
@@ -220,11 +227,16 @@ public partial class QuickPanelWindow
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         SearchQuery = SearchBox.Text;
+        ResetSelection();
         _searchDebounceTimer.Stop();
         _searchDebounceTimer.Start();
     }
 
-    private async void CategoryFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => await RefreshAsync();
+    private async void CategoryFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        ResetSelection();
+        await RefreshAsync();
+    }
 
     private void QuickList_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateQuickCardWidths();
 
@@ -273,7 +285,7 @@ public partial class QuickPanelWindow
         }
     }
 
-    private async void SearchBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    private async void SearchBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key == Key.Enter)
         {
@@ -312,15 +324,36 @@ public partial class QuickPanelWindow
         {
             AnimateCard(itemCard, 1, 1);
         }
-        await PasteAsync((sender as FrameworkElement)?.Tag as ClipboardItem);
+        var item = (sender as FrameworkElement)?.Tag as ClipboardItem;
+        SelectItem(item);
+        await PasteAsync(item);
     }
 
     private void ItemCard_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (!IsActionElement(e.OriginalSource as DependencyObject) && sender is Border card)
         {
+            SelectItem((sender as FrameworkElement)?.Tag as ClipboardItem);
             AnimateCard(card, 0.985, 1);
         }
+    }
+
+    private void SelectItem(ClipboardItem? item)
+    {
+        if (item is null)
+        {
+            return;
+        }
+
+        var items = CombinedItems();
+        var index = items.ToList().FindIndex(candidate => candidate.Id == item.Id);
+        if (index < 0)
+        {
+            return;
+        }
+
+        _selectedIndex = index;
+        SelectedItemId = item.Id;
     }
 
     private async void FavoriteItem_Click(object sender, RoutedEventArgs e)

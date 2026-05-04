@@ -61,7 +61,7 @@
                                  Padding="0,8,14,8"
                                  ToolTip="搜索剪切板内容、来源应用或标签"
                                  TextChanged="SearchBox_TextChanged"
-                                 KeyDown="SearchBox_KeyDown"/>
+                                 PreviewKeyDown="SearchBox_PreviewKeyDown"/>
                     </Grid>
                 </Border>
 
