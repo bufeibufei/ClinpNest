@@ -294,10 +294,20 @@ public partial class QuickPanelWindow
         }
         else if (e.Key == Key.Down)
         {
-            MoveSelection(1);
+            MoveVerticalSelection(1);
             e.Handled = true;
         }
         else if (e.Key == Key.Up)
+        {
+            MoveVerticalSelection(-1);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Right)
+        {
+            MoveSelection(1);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Left)
         {
             MoveSelection(-1);
             e.Handled = true;
@@ -354,6 +364,82 @@ public partial class QuickPanelWindow
 
         _selectedIndex = index;
         SelectedItemId = item.Id;
+    }
+
+    private void MoveVerticalSelection(int direction)
+    {
+        var favoriteCount = _favorites.Count;
+        var historyCount = _history.Count;
+        if (favoriteCount + historyCount == 0)
+        {
+            SelectedItemId = 0;
+            return;
+        }
+
+        if (_selectedIndex < favoriteCount)
+        {
+            MoveWithinSection(direction, sectionStart: 0, sectionCount: favoriteCount, columns: Math.Max(1, _favoriteColumns));
+            return;
+        }
+
+        MoveWithinSection(direction, sectionStart: favoriteCount, sectionCount: historyCount, columns: Math.Max(1, _historyColumns));
+    }
+
+    private void MoveWithinSection(int direction, int sectionStart, int sectionCount, int columns)
+    {
+        if (sectionCount <= 0)
+        {
+            return;
+        }
+
+        var localIndex = Math.Clamp(_selectedIndex - sectionStart, 0, sectionCount - 1);
+        var targetLocalIndex = localIndex + direction * columns;
+
+        if (targetLocalIndex < 0)
+        {
+            if (sectionStart > 0)
+            {
+                var target = Math.Min(sectionStart - 1, localIndex);
+                SetSelectionIndex(target);
+            }
+            else
+            {
+                SetSelectionIndex(sectionStart);
+            }
+            return;
+        }
+
+        if (targetLocalIndex >= sectionCount)
+        {
+            var nextSectionStart = sectionStart + sectionCount;
+            var totalCount = _favorites.Count + _history.Count;
+            if (nextSectionStart < totalCount)
+            {
+                var target = Math.Min(nextSectionStart + localIndex, totalCount - 1);
+                SetSelectionIndex(target);
+            }
+            else
+            {
+                SetSelectionIndex(sectionStart + sectionCount - 1);
+            }
+            return;
+        }
+
+        SetSelectionIndex(sectionStart + targetLocalIndex);
+    }
+
+    private void SetSelectionIndex(int index)
+    {
+        var items = CombinedItems();
+        if (items.Count == 0)
+        {
+            _selectedIndex = 0;
+            SelectedItemId = 0;
+            return;
+        }
+
+        _selectedIndex = Math.Clamp(index, 0, items.Count - 1);
+        SelectedItemId = items[_selectedIndex].Id;
     }
 
     private async void FavoriteItem_Click(object sender, RoutedEventArgs e)
