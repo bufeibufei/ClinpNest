@@ -45,6 +45,7 @@ public partial class MainWindow
     private int _historyLimit = 100;
     private int _gridColumns;
     private double _lastCardWidth;
+    private bool _sortDescending = true;
 
     public MainWindow(
         ClipboardRepository clipboardRepository,
@@ -79,6 +80,7 @@ public partial class MainWindow
         SearchBox.Text = string.Empty;
         SearchQuery = string.Empty;
         SetPageMode(favoritesOnly: false);
+        UpdateSortToggle();
         UpdateStatus();
 
         SourceInitialized += MainWindow_SourceInitialized;
@@ -145,7 +147,7 @@ public partial class MainWindow
         }
 
         _items.Clear();
-        foreach (var item in results)
+        foreach (var item in SortItems(results))
         {
             _items.Add(item);
         }
@@ -155,6 +157,26 @@ public partial class MainWindow
         SummaryTitleText.Text = $"{historyCount} / {_historyLimit}";
         HistoryUsageBar.Maximum = Math.Max(1, _historyLimit);
         HistoryUsageBar.Value = Math.Min(historyCount, _historyLimit);
+    }
+
+    private IEnumerable<ClipboardItem> SortItems(IEnumerable<ClipboardItem> items)
+    {
+        if (_favoritesOnly)
+        {
+            return _sortDescending
+                ? items.OrderByDescending(item => item.IsPinned).ThenByDescending(item => item.FavoriteDisplayTime)
+                : items.OrderByDescending(item => item.IsPinned).ThenBy(item => item.FavoriteDisplayTime);
+        }
+
+        return _sortDescending
+            ? items.OrderByDescending(item => item.UpdatedAt)
+            : items.OrderBy(item => item.UpdatedAt);
+    }
+
+    private void UpdateSortToggle()
+    {
+        SortToggleIcon.Text = _sortDescending ? "\uE74A" : "\uE74B";
+        SortToggleText.Text = _sortDescending ? "最新优先" : "最旧优先";
     }
 
     private async Task LoadCategoriesAsync()
@@ -365,6 +387,13 @@ public partial class MainWindow
     private async void CategoryFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => await RefreshAsync();
 
     private async void ClearButton_Click(object sender, RoutedEventArgs e) => await ClearAsync();
+
+    private async void SortToggleButton_Click(object sender, RoutedEventArgs e)
+    {
+        _sortDescending = !_sortDescending;
+        UpdateSortToggle();
+        await RefreshAsync();
+    }
 
     private void PauseButton_Click(object sender, RoutedEventArgs e) => TogglePause();
 

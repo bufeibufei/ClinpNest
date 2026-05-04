@@ -37,6 +37,7 @@ public partial class QuickPanelWindow
     private double _lastFavoriteCardWidth;
     private double _lastHistoryCardWidth;
     private int _selectedIndex;
+    private bool _sortDescending = true;
 
     public QuickPanelWindow(ClipboardRepository clipboardRepository, PasteService pasteService)
     {
@@ -51,6 +52,7 @@ public partial class QuickPanelWindow
         };
         FavoritesList.ItemsSource = _favorites;
         HistoryList.ItemsSource = _history;
+        UpdateSortToggle();
         Closing += QuickPanelWindow_Closing;
     }
 
@@ -151,17 +153,33 @@ public partial class QuickPanelWindow
         _favorites.Clear();
         _history.Clear();
 
-        foreach (var item in results.Where(item => item.IsFavorite).Take(32))
+        foreach (var item in SortFavorites(results.Where(item => item.IsFavorite)).Take(32))
         {
             _favorites.Add(item);
         }
 
-        foreach (var item in results.Where(item => !item.IsFavorite).Take(64))
+        foreach (var item in SortHistory(results.Where(item => !item.IsFavorite)).Take(64))
         {
             _history.Add(item);
         }
 
         NormalizeSelection(preferFirstItem: false);
+    }
+
+    private IEnumerable<ClipboardItem> SortFavorites(IEnumerable<ClipboardItem> items)
+        => _sortDescending
+            ? items.OrderByDescending(item => item.IsPinned).ThenByDescending(item => item.FavoriteDisplayTime)
+            : items.OrderByDescending(item => item.IsPinned).ThenBy(item => item.FavoriteDisplayTime);
+
+    private IEnumerable<ClipboardItem> SortHistory(IEnumerable<ClipboardItem> items)
+        => _sortDescending
+            ? items.OrderByDescending(item => item.UpdatedAt)
+            : items.OrderBy(item => item.UpdatedAt);
+
+    private void UpdateSortToggle()
+    {
+        SortToggleIcon.Text = _sortDescending ? "\uE74A" : "\uE74B";
+        SortToggleText.Text = _sortDescending ? "最新优先" : "最旧优先";
     }
 
     private IReadOnlyList<ClipboardItem> CombinedItems()
@@ -234,6 +252,14 @@ public partial class QuickPanelWindow
 
     private async void CategoryFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        ResetSelection();
+        await RefreshAsync();
+    }
+
+    private async void SortToggleButton_Click(object sender, RoutedEventArgs e)
+    {
+        _sortDescending = !_sortDescending;
+        UpdateSortToggle();
         ResetSelection();
         await RefreshAsync();
     }
