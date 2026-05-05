@@ -312,16 +312,6 @@
 
                                         <Border Height="3" Background="#2F7DF6" CornerRadius="2" VerticalAlignment="Top" Margin="-14,-14,-14,0"/>
 
-                                        <Border HorizontalAlignment="Right"
-                                                VerticalAlignment="Top"
-                                                Background="#2F7DF6"
-                                                CornerRadius="0,10,0,8"
-                                                Padding="7,4"
-                                                Margin="0,-14,-14,0"
-                                                Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibilityConverter}}">
-                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE718;" Foreground="White" FontSize="13"/>
-                                        </Border>
-
                                         <Grid Grid.Row="0" Margin="0,8,0,0">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition x:Name="TypeIconColumn" Width="0"/>
@@ -402,7 +392,11 @@
                                 <DataTemplate.Triggers>
                                     <DataTrigger Binding="{Binding IsFavoritesView, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
                                         <Setter TargetName="ItemTimeText" Property="Text" Value="{Binding FavoriteDisplayTime, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"/>
-                                        <Setter TargetName="FavoriteButton" Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsPinned}" Value="True">
+                                        <Setter TargetName="PinButton" Property="Foreground" Value="#2F7DF6"/>
+                                        <Setter TargetName="PinButton" Property="BorderBrush" Value="#BBD2FF"/>
+                                        <Setter TargetName="PinButton" Property="Background" Value="#EAF3FF"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsFavorite}" Value="True">
                                         <Setter TargetName="FavoriteButton" Property="Foreground" Value="#F59E0B"/>
